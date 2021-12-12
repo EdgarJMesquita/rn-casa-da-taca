@@ -1,14 +1,21 @@
-import React from 'react';
-import { TouchableOpacity, View } from 'react-native';
-import { Entypo } from '@expo/vector-icons';
+import React, { ReactNode } from 'react';
+import { TouchableOpacity, TouchableOpacityProps, View } from 'react-native';
+import { Entypo, FontAwesome } from '@expo/vector-icons';
 import { theme } from '../../global/theme';
 import { styles } from './styles';
 
-export function Fab(){
+type FabProps = TouchableOpacityProps & {
+  icon: ReactNode;
+}
+
+export function Fab({icon, ...props}:FabProps){
   return (
-    <TouchableOpacity style={styles.button}>
+    <TouchableOpacity
+      {...props}
+      style={styles.button}
+    >
       <View style={styles.fab}>
-        <Entypo name="plus" size={30} color={theme.colors.text}/>
+        {icon}
       </View>
     </TouchableOpacity>
   );

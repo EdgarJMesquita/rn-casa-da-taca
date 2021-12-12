@@ -18,8 +18,8 @@ export const styles = StyleSheet.create({
 
   priceContainer: {
     position: 'absolute',
-    bottom: 15,
-    right: 15
+    bottom: 9,
+    right: 18
   },
 
   price: {

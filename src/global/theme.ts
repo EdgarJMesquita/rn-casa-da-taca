@@ -5,6 +5,7 @@ export const theme = {
     black100: '#000000',
     black80: '#1B161A',
     text: '#f8f8f8',
+    white: '#ffffff'
   },
   fonts: {
     Roboto_400: 'Roboto_400Regular',
