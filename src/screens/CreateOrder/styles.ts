@@ -12,7 +12,7 @@ export const styles = StyleSheet.create({
     fontFamily: theme.fonts.Roboto_700,
     color: theme.colors.text,
     fontSize: 22,
-    marginBottom: 20
+    marginLeft: 10
   },
 
   form: {

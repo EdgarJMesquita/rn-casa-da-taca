@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, TextInput } from 'react-native';
 import { theme } from '../../global/theme';
-import { FontAwesome } from '@expo/vector-icons'; 
+import { FontAwesome, FontAwesome5, Fontisto } from '@expo/vector-icons'; 
 import { styles } from './styles';
 import { FlavorSelect } from '../../components/FlavorSelect';
 import { RectButton } from 'react-native-gesture-handler';
 import { useMenu } from '../../hooks/useMenu';
-import { CreateOrderProps } from '../../routes/auth.routes';
 import { Background } from '../../components/Background';
 import { useOrders } from '../../hooks/useOrders';
+import { CreateOrderProps } from '../../routes/types';
 
 export function CreateOrder({route, navigation}:CreateOrderProps){
   const { selectedMenuItem, memberId, tableId } = route.params;
@@ -24,7 +24,7 @@ export function CreateOrder({route, navigation}:CreateOrderProps){
 
   async function handleAddOrder() {
     if(!firstFlavor || !selectedMenuItem?.name) return;
-
+    
     const order = {
       name: selectedMenuItem?.name,
       firstFlavor,
@@ -33,8 +33,10 @@ export function CreateOrder({route, navigation}:CreateOrderProps){
       secondFlavor: 
         (selectedMenuItem?.sizes[size]===330 || selectedMenuItem?.sizes[size] === 600 || selectedMenuItem?.type==="ship")? 
         secondFlavor:'',
-      size: selectedMenuItem.sizes[size]
+      size: selectedMenuItem?.sizes[size],
+      type: selectedMenuItem.type
     }
+
     try {
       const orderRef = await addOrder(tableId, memberId, order);
       if(!orderRef) return;
@@ -48,13 +50,22 @@ export function CreateOrder({route, navigation}:CreateOrderProps){
   return (
     <Background>
       <View style={styles.container}>
-        <Text style={styles.title}>{selectedMenuItem?.name}</Text>
+        <View style={{flexDirection: 'row', alignItems: 'center', marginBottom: 20}}>
+        {
+          selectedMenuItem?.type==='cup'?
+          <FontAwesome5 name="wine-glass" color={theme.colors.primary} size={20} />:
+          <Fontisto name="ship" color={theme.colors.primary} size={20} />
+        }
+          <Text style={styles.title}>{selectedMenuItem?.name}</Text>
+        </View>
 
         <View style={styles.form}>
-          <Text style={styles.label}>Tamanho*</Text>
+          {
+            selectedMenuItem?.type==='cup' && <Text style={styles.label}>Tamanho*</Text>
+          }
           <View style={{flexDirection: 'row'}}>
             {
-              selectedMenuItem?.sizes.map((item, index)=>(
+              selectedMenuItem?.sizes?.map((item, index)=>(
                 <TouchableOpacity
                   onPress={()=>setSize(index)} 
                   style={[styles.button, { borderColor: size===index? theme.colors.primary: 'transparent' }]}
@@ -82,7 +93,7 @@ export function CreateOrder({route, navigation}:CreateOrderProps){
             <FontAwesome name="caret-down" size={20} color={theme.colors.text} />
           </TouchableOpacity>
 
-          { (selectedMenuItem?.sizes[size]===330 || selectedMenuItem?.sizes[size] === 600 || selectedMenuItem?.type==="ship") &&
+          { (selectedMenuItem?.type==="ship" || selectedMenuItem?.sizes[size]===330 || selectedMenuItem?.sizes[size] === 600 ) &&
             <>
               <Text style={[styles.label, {marginTop: 10}]}>
                 Segundo sabor

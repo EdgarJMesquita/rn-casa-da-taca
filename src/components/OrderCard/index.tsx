@@ -5,14 +5,34 @@ import { theme } from '../../global/theme';
 import { styles } from './styles';
 import { OrderProps } from '../../context/OrderContext';
 import { BorderlessButton } from 'react-native-gesture-handler';
-import { AntDesign } from '@expo/vector-icons';
+import { AntDesign, MaterialIcons } from '@expo/vector-icons';
 
 type CardProps = {
   order: OrderProps;
   deleteOrder: ()=>void;
 }
 
-export function Card({ order, deleteOrder }:CardProps){
+export function OrderCard({ order, deleteOrder }:CardProps){
+
+  if(order.type==='drink'){
+    return(
+      <View style={styles.drinkCard}>
+        <View style={styles.leftBar}></View>
+
+        <View style={{flex: 1, flexDirection: 'row', paddingHorizontal: 10, alignItems: 'center'}}>
+          <MaterialIcons name="local-drink" color={theme.colors.primary} size={25} />
+          <Text style={styles.drinkTitle}>
+            {order.name}
+          </Text>
+        </View>
+        
+        <Text style={styles.drinkTotal}>
+          R$ {order.price}
+        </Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <BorderlessButton 
@@ -70,7 +90,7 @@ export function Card({ order, deleteOrder }:CardProps){
           Observação
         </Text>
         <Text style={styles.textArea}>
-          {order.observation? order.observation : 'Sem observação'}
+          {order.observation || 'Sem observação'}
         </Text>
 
         <View style={{flex: 1, justifyContent: 'flex-end'}}>

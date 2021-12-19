@@ -2,36 +2,35 @@ import React, { useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 import { Background } from '../../components/Background';
 import { Fab } from '../../components/Fab';
-import { MemberDetailsProps } from '../../routes/auth.routes';
 import { styles } from './styles';
-import { Entypo } from '@expo/vector-icons';
+import { Entypo, AntDesign } from '@expo/vector-icons';
 import { theme } from '../../global/theme';
-import { Card } from '../../components/Card';
+import { OrderCard } from '../../components/OrderCard';
 import { MenuSelect } from '../../components/MenuSelect';
 import { useOrders } from '../../hooks/useOrders';
 import { MenuProps } from '../../context/MenuContext';
+import { MemberOrdersProps } from '../../routes/types';
+import { BorderlessButton } from 'react-native-gesture-handler';
 
-export function MemberDetails({ route, navigation }:MemberDetailsProps){
+export function MemberOrders({ route, navigation }:MemberOrdersProps){
   const { tableId, memberId } = route.params;
   const { tables, deleteOrder, addOrder } = useOrders();
   const [ isMenuVisible, setMenuVisible ] = useState(false);
-
-  const selectedMember = tables.find(table=>table.id===tableId)?.members?.find(member=>member.id===memberId);
+  const selectedMember = tables?.find(table=>table.id===tableId)?.members?.find(member=>member.id===memberId);
 
   function addSelectedItem(selectedMenuItem:MenuProps){
     if(!selectedMenuItem) return;
     setMenuVisible(false);
-
+    
     if(selectedMenuItem.type==='drink'){
       addOrder(tableId, memberId, { 
         name: selectedMenuItem.name,
-        price: String(selectedMenuItem.prices[0])
+        price: String(selectedMenuItem.prices[0]),
+        type: selectedMenuItem.type
       });
-      
       return;
     }
-
-    navigation.navigate('CreateOrder',{ selectedMenuItem, memberId, tableId });
+    navigation.navigate('CreateOrder',{ selectedMenuItem: selectedMenuItem, memberId, tableId });
   }
 
   async function handleDeleteOrder(orderId:string) {
@@ -41,38 +40,42 @@ export function MemberDetails({ route, navigation }:MemberDetailsProps){
   return (
     <Background>
       <View style={styles.tableLabel}>
+        <BorderlessButton onPress={()=>navigation.goBack()}>
+          <AntDesign name="arrowleft" size={24} color={theme.colors.text} />
+        </BorderlessButton>
         <Text style={styles.title}>
           {selectedMember?.name}
         </Text>
+        <View style={{width: 20}} ></View>
       </View>
+      
       <View style={styles.container}>
         <Text style={styles.subtitle}>
           Pedidos
         </Text>
         <View style={{flex: 1, width: '100%', justifyContent: 'center', alignItems: 'center'}}>
           <ScrollView style={{flex: 1, width: '100%'}} fadingEdgeLength={100}>
-            {console.log(selectedMember?.orders)}
-            {selectedMember?.orders?
+            {selectedMember?.orders.length?
               selectedMember.orders.map((item, index)=>(
-                <Card
+                <OrderCard
                   order={item}
                   key={index}
                   deleteOrder={()=>handleDeleteOrder(item.id)}
                 />
               ))
               :
-              <Text style={styles.noMembersMessage}>
-                Este cliente ainda não fez pedidos 
-              </Text>
+              <View style={{height: 500, justifyContent: 'center'}}>
+                <Text style={styles.noMembersMessage}>
+                  Este cliente ainda não fez pedidos 
+                </Text>
+              </View>
             }
           </ScrollView>
         </View>
       </View>
       <Fab
         onPress={()=>setMenuVisible(true)}
-        icon={
-          <Entypo name="plus" size={30} color={theme.colors.text}/>
-        }
+        icon={<Entypo name="plus" size={30} color={theme.colors.text}/>}
       />
       <MenuSelect 
         isVisible={isMenuVisible}

@@ -25,5 +25,13 @@ export const styles = StyleSheet.create({
   price: {
     fontFamily: theme.fonts.Roboto_400,
     color: theme.colors.text
+  },
+
+  noMembersMessage: {
+    fontFamily: theme.fonts.Roboto_400,
+    fontSize: 15,
+    color: theme.colors.text,
+    marginBottom: 20,
+    textAlign: 'center',
   }
 });

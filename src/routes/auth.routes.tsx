@@ -1,29 +1,15 @@
 import React from 'react';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { Login } from '../screens/Login';
-import { createNativeStackNavigator, NativeStackScreenProps } from '@react-navigation/native-stack';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { theme } from '../global/theme';
 import { Header } from '../components/Header';
 import { Menu } from '../screens/Menu';
 import { CustomDrawer } from '../components/CustomDrawer';
-import { Entypo, MaterialCommunityIcons, MaterialIcons, FontAwesome } from '@expo/vector-icons';
+import { Entypo, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { drawerItemStyles } from './drawerItemStyles';
 import { AttendanceRoutes } from './attendance.routes';
-import { MenuProps } from '../context/MenuContext';
 import { Kitchen } from '../screens/Kitchen';
-
-type RootParamsList = {
-  Login: undefined;
-  Menu: undefined;
-  TableDetails: { tableId: string };
-  MemberDetails: { tableId: string, memberId: string };
-  CreateOrder: { tableId: string, memberId: string, selectedMenuItem: MenuProps|undefined };
-}
-
-export type StackScreensProps = NativeStackScreenProps<RootParamsList>;
-export type TableDetailsProps = NativeStackScreenProps<RootParamsList,'TableDetails'>;
-export type MemberDetailsProps = NativeStackScreenProps<RootParamsList,'MemberDetails'>;
-export type CreateOrderProps = NativeStackScreenProps<RootParamsList,'CreateOrder'>;
 
 const Drawer = createDrawerNavigator();
 const Stack = createNativeStackNavigator();
@@ -69,7 +55,7 @@ function DrawerRoutes(){
         name="Cashier"
         component={Kitchen}
         options={{
-          drawerIcon: (props)=><FontAwesome name="money" color="#FFFFFF" size={22} />,
+          drawerIcon: (props)=><MaterialIcons name="attach-money" color="#FFFFFF" size={22}/>,
           title: 'Caixa',
           ...drawerItemStyles,
         }}

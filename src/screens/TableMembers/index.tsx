@@ -3,37 +3,45 @@ import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
 import { Background } from '../../components/Background';
 import { Fab } from '../../components/Fab';
 import { Member } from '../../components/Member';
-import { TableDetailsProps } from '../../routes/auth.routes';
 import { styles } from './styles';
-import { FontAwesome } from '@expo/vector-icons';
+import { FontAwesome, AntDesign } from '@expo/vector-icons';
 import { theme } from '../../global/theme';
 import { PromptModal } from '../../components/PromptModal';
 import { useOrders } from '../../hooks/useOrders';
+import { TableMembersProps } from '../../routes/types';
+import { BorderlessButton } from 'react-native-gesture-handler';
 
-export function TableDetails({ route, navigation }:TableDetailsProps){
+export function TableMembers({ route, navigation }:TableMembersProps){
   const tableId = route.params.tableId;
   const { tables } = useOrders();
   const [ newMember, setNewMember ] = useState('');
   const [ isVisible, setVisible ] = useState(false);
   const { addMember } = useOrders();
 
-  const selectedTable = tables.find(item=>item.id===tableId);
+  const selectedTable = tables?.find(item=>item.id===tableId);
 
-  async function handleAddMember(){
+  async function handleAddMember(newMember:string){
     if(!newMember) return;
     const memberRef = await addMember(tableId, newMember);
+    setVisible(false);
+    
     if(!memberRef) return;
-
-    navigation.navigate('MemberDetails',{ tableId, memberId: memberRef })
+    
+    navigation.navigate('MemberOrders',{ tableId, memberId: memberRef })
   }
 
   return (
     <Background>
       <View style={styles.tableLabel}>
+        <BorderlessButton onPress={()=>navigation.goBack()}>
+          <AntDesign name="arrowleft" size={24} color={theme.colors.text} />
+        </BorderlessButton>
         <Text style={styles.title}>
           Mesa {selectedTable?.name}
         </Text>
+        <View style={{width: 20}} ></View>
       </View>
+
       <View style={styles.container}>
         <Text style={styles.subtitle}>
           Membros
@@ -41,20 +49,20 @@ export function TableDetails({ route, navigation }:TableDetailsProps){
         <View style={{flex: 1, width: '100%', justifyContent: 'center', alignItems: 'center'}}>
           <ScrollView style={{flex: 1, width: '100%'}}>
             {
-              selectedTable?
-                selectedTable?.members?
-                  selectedTable.members.map((member, index)=>(
-                    <Member
-                      action={()=>navigation.navigate('MemberDetails',{ tableId: tableId, memberId: member.id })}
-                      name={member.name} 
-                      key={index}
-                    />
-                  ))
-                  :
+              selectedTable?.members?.length?
+                selectedTable.members.map((member, index)=>(
+                  <Member
+                    action={()=>navigation.navigate('MemberOrders',{ tableId: tableId, memberId: member.id })}
+                    name={member.name} 
+                    key={index}
+                  />
+                ))
+                :
+                <View style={{height: 500, justifyContent: 'center'}}>
                   <Text style={styles.noMembersMessage}>
                     Esta mesa ainda não tem membros
                   </Text>
-                : <ActivityIndicator color={theme.colors.primary} size={20} />
+                </View>
             }
           </ScrollView>
         </View>
@@ -76,7 +84,7 @@ export function TableDetails({ route, navigation }:TableDetailsProps){
         label="Digite o nome do membro:"
         text={newMember}
         setText={setNewMember}
-        action={handleAddMember}
+        action={()=>handleAddMember(newMember)}
       />
     </Background>
   );

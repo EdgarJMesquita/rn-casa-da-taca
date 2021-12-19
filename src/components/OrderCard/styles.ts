@@ -109,5 +109,31 @@ export const styles = StyleSheet.create({
     fontFamily: theme.fonts.Roboto_700,
     color: theme.colors.text,
     fontSize: 15
+  },
+
+  drinkCard: {
+    width: '100%',
+    height: 50,
+    backgroundColor: theme.colors.black100,
+    marginBottom: 10,
+    borderRadius: 10,
+    alignItems: 'center',
+    flexDirection: 'row',
+    overflow: 'hidden',
+    
+  },
+
+  drinkTitle: {
+    fontFamily: theme.fonts.Roboto_700,
+    color: theme.colors.text,
+    fontSize: 22,
+    marginLeft: 10
+  },
+
+  drinkTotal: {
+    fontFamily: theme.fonts.Ubuntu500,
+    color: theme.colors.text,
+    fontSize: 22,
+    marginRight: 15
   }
 });

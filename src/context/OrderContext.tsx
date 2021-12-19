@@ -11,6 +11,7 @@ export type OrderProps = {
   secondFlavor: string;
   observation: string;
   price: string;
+  type: 'cup'|'ship'|'drink';
 }
 
 type MemberProps = {
@@ -36,10 +37,11 @@ type NewOrderProps = {
   secondFlavor?: string;
   observation?: string;
   price: string;
+  type: 'cup'|'ship'|'drink'
 }
 
 type OrdersContextProps = {
-  tables: TableProps[];
+  tables: TableProps[]|undefined;
   createTable: (tableName: string)=>Promise<string|null>;
   addMember: (tableId: string, memberName: string)=>Promise<string|null>;
   addOrder: (tableId: string, memberId: string, order: NewOrderProps)=>Promise<string|null>;
@@ -54,6 +56,7 @@ type DatabaseOrderProps = {
     secondFlavor: string;
     observation: string;
     price: string;
+    type: 'cup'|'ship'|'drink'
   }
 }
 
@@ -76,7 +79,7 @@ type OrderDatabaseProps = {
 export const OrdersContext = createContext({}as OrdersContextProps);
 
 export function OrdersContextProvider({children}:OrdersContextProviderProps){
-  const [ tables, setTables ] = useState<TableProps[]>([]);
+  const [ tables, setTables ] = useState<TableProps[]|undefined>();
 
   async function createTable(tableName: string) {
     try {
@@ -121,7 +124,10 @@ export function OrdersContextProvider({children}:OrdersContextProviderProps){
   useEffect(()=>{
     const tableRef = ref(database, 'tables');
     onValue(tableRef,(dataSnapshot)=>{
-      if(!dataSnapshot.exists()) return;
+      if(!dataSnapshot.exists()){
+        setTables([]);
+        return;
+      } 
       const databaseData:OrderDatabaseProps = dataSnapshot.val();
 
       const data = Object.entries(databaseData)

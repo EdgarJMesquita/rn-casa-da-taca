@@ -1,6 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { SafeAreaView } from 'react-native';
 import { theme } from './src/global/theme';
 import { Routes } from './src/routes';
 import { Roboto_400Regular, Roboto_700Bold } from '@expo-google-fonts/roboto';

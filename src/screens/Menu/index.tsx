@@ -1,13 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { ScrollView, View, Text, ImageBackground } from 'react-native';
 import { Background } from '../../components/Background';
 import Lisboa from '../../assets/lisboa.png';
 import { styles } from './styles';
-import { Fab } from '../../components/Fab';
-import { PromptModal } from '../../components/PromptModal';
-import { StackScreensProps } from '../../routes/auth.routes';
-import { theme } from '../../global/theme';
-import { Entypo } from '@expo/vector-icons';
+
 
 const data = [
   {
@@ -27,16 +23,7 @@ const data = [
   },
 ]
 
-export function Menu({navigation}:StackScreensProps){
-  const [ isVisible, setVisible ] = useState(false);
-  const [ table, setTable ] = useState('');
-
-  async function handleCreateTable() {
-    if(!table) return;
-    setVisible(false);
-    setTable('');
-    navigation.navigate('TableDetails', { table });
-  }
+export function Menu(){
 
   return (
     <Background>
@@ -66,18 +53,6 @@ export function Menu({navigation}:StackScreensProps){
           }
         </ScrollView>
       </View>
-      <Fab 
-        onPress={()=>setVisible(prev=>!prev)}
-        icon={<Entypo name="plus" size={30} color={theme.colors.text}/>}
-      />
-      <PromptModal
-        isVisible={isVisible}
-        label="Digite a mesa:"
-        closeModal={()=>setVisible(prev=>!prev)}
-        action={handleCreateTable}
-        setText={setTable}
-        text={table}
-      />
     </Background>
   );
 }

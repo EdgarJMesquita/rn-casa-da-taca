@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 import { Background } from '../../components/Background';
-import { MemberDetailsProps } from '../../routes/auth.routes';
 import { styles } from './styles';
-import { Card } from '../../components/Card';
+import { OrderCard } from '../../components/OrderCard';
 import { useOrders } from '../../hooks/useOrders';
+import { StackScreensProps } from '../../routes/types';
 
-export function Kitchen({ route, navigation }:MemberDetailsProps){
+export function Kitchen({ route, navigation }:StackScreensProps){
   const { tables } = useOrders();
 
   async function handleDeleteOrder(orderId:string){
@@ -17,7 +17,7 @@ export function Kitchen({ route, navigation }:MemberDetailsProps){
     <Background>
       <ScrollView style={{flex: 1, width: '100%'}}>
         {
-          tables.map((table, index)=>(
+          tables?.map((table, index)=>(
             table?.members?.length!==0 &&
               <View key={index}>
                 <View style={styles.tableLabel}>
@@ -37,13 +37,16 @@ export function Kitchen({ route, navigation }:MemberDetailsProps){
                             </Text>
                           }
                           {
-                            member.orders.map((order, index)=>(
-                              <Card
-                                order={order}
-                                key={index}
-                                deleteOrder={()=>handleDeleteOrder(order.id)}
-                              />
-                            ))
+                            member.orders.map((order, index)=>{
+                              if(order.type==='drink')return null;
+                              return(
+                                <OrderCard
+                                  order={order}
+                                  key={index}
+                                  deleteOrder={()=>handleDeleteOrder(order.id)}
+                                />
+                              )
+                            })
                           }
                         </View>
                       ))

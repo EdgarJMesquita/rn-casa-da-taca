@@ -10,10 +10,13 @@ export const styles = StyleSheet.create({
   },
 
   tableLabel: {
+    flexDirection: 'row',
     width: '100%', 
-    height: 50, 
+    height: 50,
+    paddingHorizontal: 15, 
     backgroundColor: theme.colors.primary,
-    justifyContent: 'center'
+    justifyContent: 'space-between',
+    alignItems: 'center'
   },
 
   title: {

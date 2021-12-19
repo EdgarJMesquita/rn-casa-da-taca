@@ -23,9 +23,6 @@ export function MenuSelect({isVisible, closeModal, addSelectedItem}:ModalSelectP
       animationIn="slideInUp"
       animationOut="slideOutDown"
       style={{margin: 0}}
-      swipeDirection="down"
-      onSwipeComplete={closeModal}
-      swipeThreshold={100}
       propagateSwipe
     >
       <Pressable style={styles.container}>
