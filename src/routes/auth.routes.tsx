@@ -6,21 +6,24 @@ import { theme } from '../global/theme';
 import { Header } from '../components/Header';
 import { Menu } from '../screens/Menu';
 import { CustomDrawer } from '../components/CustomDrawer';
-import { Entypo } from '@expo/vector-icons';
+import { Entypo, MaterialCommunityIcons, MaterialIcons, FontAwesome } from '@expo/vector-icons';
 import { drawerItemStyles } from './drawerItemStyles';
-import { TableDetails } from '../screens/TableDetails';
-import { MemberDetails } from '../screens/MemberDetails';
+import { AttendanceRoutes } from './attendance.routes';
+import { MenuProps } from '../context/MenuContext';
+import { Kitchen } from '../screens/Kitchen';
 
 type RootParamsList = {
   Login: undefined;
   Menu: undefined;
-  TableDetails: { table: string };
-  MemberDetails: { table: string, member: string };
+  TableDetails: { tableId: string };
+  MemberDetails: { tableId: string, memberId: string };
+  CreateOrder: { tableId: string, memberId: string, selectedMenuItem: MenuProps|undefined };
 }
 
 export type StackScreensProps = NativeStackScreenProps<RootParamsList>;
 export type TableDetailsProps = NativeStackScreenProps<RootParamsList,'TableDetails'>;
 export type MemberDetailsProps = NativeStackScreenProps<RootParamsList,'MemberDetails'>;
+export type CreateOrderProps = NativeStackScreenProps<RootParamsList,'CreateOrder'>;
 
 const Drawer = createDrawerNavigator();
 const Stack = createNativeStackNavigator();
@@ -29,10 +32,21 @@ function DrawerRoutes(){
   return(
     <Drawer.Navigator
       screenOptions={{
-        header: (props)=><Header {...props} />
+        header: (props)=><Header {...props} />,
+        overlayColor: theme.colors.black100
       }}
       drawerContent={CustomDrawer}
     >
+      <Drawer.Screen 
+        name="Attendance"
+        component={AttendanceRoutes}
+        options={{
+          drawerIcon: (props)=><MaterialCommunityIcons name="table-furniture" color="#FFFFFF" size={22} />,
+          title: 'Mesas',
+          ...drawerItemStyles,
+        }}
+      />
+
       <Drawer.Screen 
         name="Menu"
         component={Menu}
@@ -40,27 +54,27 @@ function DrawerRoutes(){
           drawerIcon: (props)=><Entypo name="home" color="#FFFFFF" size={22} />,
           title: 'Menu',
           ...drawerItemStyles,
-
         }}
       />
-      <Drawer.Screen
-        name="TableDetails"
-        component={TableDetails}
+      <Drawer.Screen 
+        name="Kitchen"
+        component={Kitchen}
         options={{
-          drawerItemStyle: {
-            display: 'none'
-          }
+          drawerIcon: (props)=><MaterialIcons name="kitchen" color="#FFFFFF" size={22} />,
+          title: 'Cozinha',
+          ...drawerItemStyles,
         }}
       />
-      <Drawer.Screen
-        name="MemberDetails"
-        component={MemberDetails}
+      <Drawer.Screen 
+        name="Cashier"
+        component={Kitchen}
         options={{
-          drawerItemStyle: {
-            display: 'none'
-          }
+          drawerIcon: (props)=><FontAwesome name="money" color="#FFFFFF" size={22} />,
+          title: 'Caixa',
+          ...drawerItemStyles,
         }}
       />
+     
     </Drawer.Navigator>
   );
 }

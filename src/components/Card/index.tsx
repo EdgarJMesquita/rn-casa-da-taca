@@ -1,108 +1,84 @@
-import React, { useState } from 'react';
-import { View, Text, Image, TouchableOpacity, TextInput } from 'react-native';
+import React from 'react';
+import { View, Text, Image } from 'react-native';
 import Taca from '../../assets/taca.png';
 import { theme } from '../../global/theme';
-import { FontAwesome } from '@expo/vector-icons'; 
 import { styles } from './styles';
-import { FlavorSelect } from '../FlavorSelect';
-import { RectButton } from 'react-native-gesture-handler';
+import { OrderProps } from '../../context/OrderContext';
+import { BorderlessButton } from 'react-native-gesture-handler';
+import { AntDesign } from '@expo/vector-icons';
 
 type CardProps = {
-  name: string;
+  order: OrderProps;
+  deleteOrder: ()=>void;
 }
 
-export function Card({name}:CardProps){
-  const [ size, setSize ] = useState<'250'|'330'>('250');
-  const [ flavor, setFlavor ] = useState('');
-  const [ secondFlavor, setSecondFlavor ] = useState('');
-  const [ observation, setObservation ] = useState('');
-  const [ isFlavorSelectVisible, setFlavorSelectVisible ] = useState(false);
-
-
+export function Card({ order, deleteOrder }:CardProps){
   return (
     <View style={styles.container}>
+      <BorderlessButton 
+        onPress={deleteOrder}
+        style={styles.close}
+      >
+        <AntDesign name="close" size={20} color={theme.colors.white} />
+      </BorderlessButton>
       <View style={styles.leftBar}></View>
 
       <View style={{width: '35%'}}>
-        <Text style={styles.title}>{name}</Text>
+        <Text style={styles.title}>{order.name}</Text>
         <Image source={Taca} style={{marginTop: 35, alignSelf: 'center'}}/>
       </View>
 
       <View style={styles.form}>
-        <Text style={styles.label}>Tamanho*</Text>
+        <Text style={styles.label}>Tamanho</Text>
         <View style={{flexDirection: 'row'}}>
-          <TouchableOpacity
-            onPress={()=>setSize('250')} 
-            style={[styles.button, { borderColor: size==='250'? theme.colors.primary: 'transparent' }]}
+          <View
+            style={[styles.button, { borderColor: theme.colors.primary }]}
           >
             <Text style={styles.buttonTitle}>
-              250 ml
+              {order.size} ml
             </Text>
-          </TouchableOpacity>
-          <TouchableOpacity 
-            onPress={()=>setSize('330')}
-            style={[styles.button, { borderColor: size==='330'? theme.colors.primary: 'transparent' }]}
-          >
-            <Text style={styles.buttonTitle}>
-              330 ml
-            </Text>
-          </TouchableOpacity>
+          </View>
         </View>
 
         <Text style={[styles.label, {marginTop: 10}]}>
-          Sabor*
+          Sabor
         </Text>
-        <TouchableOpacity style={styles.select}>
+        <View 
+          style={styles.select}
+        >
           <Text style={styles.text}>
-            {flavor? flavor : 'Escolha um sabor'}
+            {order.firstFlavor}
           </Text>
-          <FontAwesome name="caret-down" size={20} color={theme.colors.text} />
-        </TouchableOpacity>
+        </View>
 
-        { size==='330' &&
+        { !!order.secondFlavor &&
           <>
             <Text style={[styles.label, {marginTop: 10}]}>
-              Sabor(opcional)
+              Segundo sabor
             </Text>
-            <TouchableOpacity style={styles.select}>
+            <View 
+              style={styles.select}
+            >
               <Text style={styles.text}>
-                {flavor? flavor : 'Escolha um sabor'}
+                {order.secondFlavor}
               </Text>
-              <FontAwesome name="caret-down" size={20} color={theme.colors.text} />
-            </TouchableOpacity>
+            </View>
           </>
         }
 
         <Text style={[styles.label, {marginTop: 10}]}>
-          Observação(opcional)
+          Observação
         </Text>
-        <TextInput
-          value={observation}
-          onChangeText={setObservation}
-          style={styles.textArea}
-          multiline
-        />
+        <Text style={styles.textArea}>
+          {order.observation? order.observation : 'Sem observação'}
+        </Text>
 
         <View style={{flex: 1, justifyContent: 'flex-end'}}>
-          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-            <Text style={styles.total}>
-              R$ {'13.50'}
-            </Text>
-            <RectButton style={styles.submitButton}>
-              <Text style={styles.submitButtonText}>
-                Salvar
-              </Text>
-            </RectButton>
-          </View>
+          <Text style={styles.total}>
+            R$ {order.price}
+          </Text>
         </View>
       </View>
-
-      <FlavorSelect 
-        isVisible={isFlavorSelectVisible}
-        closeModal={()=>setFlavorSelectVisible(false)}
-        data={[]}
-        action={()=>1}
-      />
     </View>
   );
 }

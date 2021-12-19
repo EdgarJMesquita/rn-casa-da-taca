@@ -2,133 +2,47 @@ import React, { useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 import { Background } from '../../components/Background';
 import { Fab } from '../../components/Fab';
-import { Member } from '../../components/Member';
 import { MemberDetailsProps } from '../../routes/auth.routes';
 import { styles } from './styles';
-import { FontAwesome } from '@expo/vector-icons';
+import { Entypo } from '@expo/vector-icons';
 import { theme } from '../../global/theme';
 import { Card } from '../../components/Card';
-import { FlavorSelect } from '../../components/FlavorSelect';
 import { MenuSelect } from '../../components/MenuSelect';
-
-type OrderProps = {
-  name: string;
-  price250?: number;
-  price330?: number;
-  flavor?: string;
-  secondFlavor?: string;
-  observation?: string;
-}
-
-const data = [
-  {
-    name: 'Rio',
-    type: 'cup',
-    '250': 13.50,
-    '330': 16.00,
-  },
-  {
-    name: 'Denver',
-    type: 'cup',
-    '250': 14.00,
-    '330': 18.00,
-  },
-  {
-    name: 'Tokyo',
-    type: 'cup',
-    '250': 15.00,
-    '330': 18.00,
-  },
-  {
-    name: 'Nairóbi',
-    type: 'cup',
-    '250': 15.00,
-    '330': 18.00,
-  },
-  {
-    name: 'Moscou',
-    type: 'cup',
-    '250': 16.00,
-    '330': 19.00,
-  },
-  {
-    name: 'Estocolmo',
-    type: 'cup',
-    '250': 17.00,
-    '330': 20.00,
-  },
-  {
-    name: 'Denver',
-    type: 'cup',
-    '250': 13.50,
-    '330': 16.50,
-  },
-  {
-    name: 'Berlin',
-    type: 'cup',
-    '250': 19.00,
-  },
-  {
-    name: 'Palermo',
-    type: 'cup',
-    '330': 20.00,
-  },
-  {
-    name: 'Lisboa',
-    type: 'cup',
-    '600': 22.00,
-  },
-  {
-    name: 'Professor',
-    type: 'cup',
-    '600': 23.00,
-  },
-  {
-    name: 'Helsinki',
-    type: 'ship',
-    price: 24.00,
-  },
-  {
-    name: 'Bogotá',
-    type: 'ship',
-    price: 28.00,
-  },
-  {
-    name: 'water',
-    price: 2.00
-  },
-  {
-    name: 'water gas',
-    price: 2.50
-  }
-
-]
-
-type CupProps = {
-  name: string;
-  price250?: string;
-  price330?: string;
-  flavor?: string;
-  secondFlavor?: string;
-  observation?: string;
-}
+import { useOrders } from '../../hooks/useOrders';
+import { MenuProps } from '../../context/MenuContext';
 
 export function MemberDetails({ route, navigation }:MemberDetailsProps){
-  const table = route.params.table;
-  const member = route.params.member;
-
-  const [ orders, setOrders ] = useState<OrderProps[]>([]);
+  const { tableId, memberId } = route.params;
+  const { tables, deleteOrder, addOrder } = useOrders();
   const [ isMenuVisible, setMenuVisible ] = useState(false);
 
-  function addSelectedItem(name: string){
-    setOrders(prev=>[...prev, { name }]);
+  const selectedMember = tables.find(table=>table.id===tableId)?.members?.find(member=>member.id===memberId);
+
+  function addSelectedItem(selectedMenuItem:MenuProps){
+    if(!selectedMenuItem) return;
+    setMenuVisible(false);
+
+    if(selectedMenuItem.type==='drink'){
+      addOrder(tableId, memberId, { 
+        name: selectedMenuItem.name,
+        price: String(selectedMenuItem.prices[0])
+      });
+      
+      return;
+    }
+
+    navigation.navigate('CreateOrder',{ selectedMenuItem, memberId, tableId });
+  }
+
+  async function handleDeleteOrder(orderId:string) {
+    deleteOrder(tableId, memberId, orderId)
   }
 
   return (
     <Background>
       <View style={styles.tableLabel}>
         <Text style={styles.title}>
-          {member}
+          {selectedMember?.name}
         </Text>
       </View>
       <View style={styles.container}>
@@ -136,12 +50,14 @@ export function MemberDetails({ route, navigation }:MemberDetailsProps){
           Pedidos
         </Text>
         <View style={{flex: 1, width: '100%', justifyContent: 'center', alignItems: 'center'}}>
-          <ScrollView style={{flex: 1, width: '100%'}}>
-            {orders?
-              orders.map((item, index)=>(
+          <ScrollView style={{flex: 1, width: '100%'}} fadingEdgeLength={100}>
+            {console.log(selectedMember?.orders)}
+            {selectedMember?.orders?
+              selectedMember.orders.map((item, index)=>(
                 <Card
-                  name={item.name}
+                  order={item}
                   key={index}
+                  deleteOrder={()=>handleDeleteOrder(item.id)}
                 />
               ))
               :
@@ -155,18 +71,12 @@ export function MemberDetails({ route, navigation }:MemberDetailsProps){
       <Fab
         onPress={()=>setMenuVisible(true)}
         icon={
-          <FontAwesome 
-            name="user-plus" 
-            size={20} 
-            color={theme.colors.text} 
-            style={{marginLeft: 3, marginBottom: 2.2}}
-          />
+          <Entypo name="plus" size={30} color={theme.colors.text}/>
         }
       />
       <MenuSelect 
         isVisible={isMenuVisible}
         closeModal={()=>setMenuVisible(false)}
-        data={data.map(item=>item.name)}
         addSelectedItem={addSelectedItem}
       />
     </Background>

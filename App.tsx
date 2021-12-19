@@ -8,6 +8,8 @@ import { Ubuntu_400Regular, Ubuntu_500Medium } from '@expo-google-fonts/ubuntu';
 import { useFonts } from 'expo-font';
 import AppLoading from 'expo-app-loading';
 import { Background } from './src/components/Background';
+import { MenuContextProvider } from './src/context/MenuContext';
+import { OrdersContextProvider } from './src/context/OrderContext';
 
 export default function App() {
   let [ isFontsReady ] = useFonts({
@@ -25,8 +27,12 @@ export default function App() {
 
   return (
     <Background>
-      <StatusBar style="light" backgroundColor={theme.colors.black100} translucent/>
-      <Routes />
+      <OrdersContextProvider>
+      <MenuContextProvider>
+        <StatusBar style="light" backgroundColor={theme.colors.black100} translucent/>
+        <Routes />
+      </MenuContextProvider>
+      </OrdersContextProvider>
     </Background>
   );
 }

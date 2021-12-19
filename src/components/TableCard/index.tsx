@@ -1,24 +1,25 @@
 import React from 'react';
 import { Text, TouchableOpacity } from 'react-native';
-import { FontAwesome5 } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { styles } from './styles';
 import { theme } from '../../global/theme';
+import { TableProps } from '../../context/OrderContext';
 
 type MenuItemProps = {
-  name: string;
+  table: TableProps;
   action: ()=>void;
 }
 
-export function MenuItem({name, action}:MenuItemProps){
+export function TableCard({table, action}:MenuItemProps){
   return (
     <TouchableOpacity 
       onPress={action}
       style={styles.container} 
       activeOpacity={0.6}
     >
-      <FontAwesome5 name="wine-glass" color={theme.colors.primary} size={20} />
+      <MaterialCommunityIcons name="table-furniture" color={theme.colors.primary} size={30} />
       <Text style={styles.title}>
-        {name}
+        {table.name}
       </Text>
     </TouchableOpacity>
   );

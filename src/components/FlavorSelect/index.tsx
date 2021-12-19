@@ -1,17 +1,24 @@
 import React from 'react';
 import { Pressable, ScrollView, View } from 'react-native';
 import Modal from 'react-native-modal';
-import { MenuItem } from '../MenuItem';
+import { FlavorCard } from '../FlavorCard';
 import { styles } from './styles';
 
 type ModalSelectProps = {
   isVisible: boolean;
   closeModal: ()=>void;
-  data: string[];
-  action: ()=>void;
+  data: string[]|null;
+  setFlavor: (value:string)=>void;
 }
 
-export function FlavorSelect({isVisible, closeModal, data}:ModalSelectProps){
+export function FlavorSelect({isVisible, closeModal, data, setFlavor}:ModalSelectProps){
+  
+
+  function handleSelectFlavor(flavor:string){
+    setFlavor(flavor);
+    closeModal();
+  }
+
   return (
     <Modal
       isVisible={isVisible}
@@ -31,10 +38,10 @@ export function FlavorSelect({isVisible, closeModal, data}:ModalSelectProps){
         <View style={styles.topBar}></View>
         <ScrollView style={{width: '80%'}}>
           {
-            data.map((cup, index)=>(
-              <MenuItem 
-                name={cup}
-                action={()=>1}
+            data?.map((flavor, index)=>(
+              <FlavorCard 
+                flavor={flavor}
+                action={()=>handleSelectFlavor(flavor)}
                 key={index}
               />
             ))

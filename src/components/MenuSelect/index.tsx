@@ -1,17 +1,20 @@
 import React from 'react';
 import { Pressable, ScrollView, View } from 'react-native';
 import Modal from 'react-native-modal';
-import { MenuItem } from '../MenuItem';
+import { MenuProps } from '../../context/MenuContext';
+import { useMenu } from '../../hooks/useMenu';
+import { MenuCard } from '../MenuCard';
 import { styles } from './styles';
 
 type ModalSelectProps = {
   isVisible: boolean;
   closeModal: ()=>void;
-  data: string[];
-  addSelectedItem: (value:string)=>void;
+  addSelectedItem: (order:MenuProps)=>void;
 }
 
-export function MenuSelect({isVisible, closeModal, data, addSelectedItem}:ModalSelectProps){
+export function MenuSelect({isVisible, closeModal, addSelectedItem}:ModalSelectProps){
+  const { menu } = useMenu();
+
   return (
     <Modal
       isVisible={isVisible}
@@ -25,16 +28,14 @@ export function MenuSelect({isVisible, closeModal, data, addSelectedItem}:ModalS
       swipeThreshold={100}
       propagateSwipe
     >
-      <Pressable 
-        style={styles.container}
-      >
+      <Pressable style={styles.container}>
         <View style={styles.topBar}></View>
         <ScrollView style={{width: '80%'}}>
           {
-            data.map((cup, index)=>(
-              <MenuItem 
-                name={cup}
-                action={()=>addSelectedItem(cup)}
+            menu?.map((item, index)=>(
+              <MenuCard 
+                item={item}
+                action={()=>addSelectedItem(item)}
                 key={index}
               />
             ))
