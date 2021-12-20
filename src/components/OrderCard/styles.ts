@@ -4,12 +4,11 @@ import { theme } from '../../global/theme';
 export const styles = StyleSheet.create({
   container: {
     width: '100%',
-    height: 340,
     backgroundColor: theme.colors.black100,
     borderRadius: 10,
     overflow: 'hidden',
     flexDirection: 'row',
-    marginBottom: 10
+    marginBottom: 15
   },
 
   close: {
@@ -21,7 +20,7 @@ export const styles = StyleSheet.create({
   leftBar: {
     backgroundColor: theme.colors.primary,
     width: 13,
-    height: 340
+    height: '100%',
   },
 
   title: {
@@ -34,7 +33,7 @@ export const styles = StyleSheet.create({
 
   form: {
     flex: 1, 
-    paddingTop: 40,
+    paddingTop: 5,
     paddingRight: 20,
     paddingBottom: 20
   },
@@ -48,19 +47,18 @@ export const styles = StyleSheet.create({
 
   button: {
     width: '100%',
-    height: 35,
+    height: 30,
     borderWidth: 1,
     borderRadius: 5,
     justifyContent: 'center',
     alignItems: 'center',
-
     borderColor: theme.colors.primary
   },
 
   text: {
     fontFamily: theme.fonts.Roboto_400,
     color: theme.colors.text,
-    fontSize: 12,
+    fontSize: 16,
   },
 
   buttonTitle: {
@@ -70,7 +68,7 @@ export const styles = StyleSheet.create({
 
   select: {
     backgroundColor: theme.colors.black80,
-    height: 30,
+    height: 35,
     borderRadius: 5,
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -82,27 +80,30 @@ export const styles = StyleSheet.create({
     backgroundColor: theme.colors.black80,
     color: theme.colors.text,
     fontFamily: theme.fonts.Roboto_400,
-    fontSize: 12,
-    minHeight: 30,
+    fontSize: 16,
+    minHeight: 35,
     borderRadius: 5,
     paddingHorizontal: 10,
-    textAlignVertical: 'center'
+    textAlignVertical: 'center',
+    marginBottom: 25,
+    padding: 5
   },
 
   total: {
     fontFamily: theme.fonts.Ubuntu500,
     color: theme.colors.text,
     fontSize: 22,
-    alignSelf: 'flex-end'
+    marginTop: 1
   },
 
   submitButton: {
     backgroundColor: theme.colors.primary,
     height: 30,
-    width: 60,
+    width: 80,
     borderRadius: 5,
     justifyContent: 'center',
     alignItems: 'center',
+    marginLeft: 10
   },
 
   submitButtonText: {
@@ -113,14 +114,13 @@ export const styles = StyleSheet.create({
 
   drinkCard: {
     width: '100%',
-    height: 50,
     backgroundColor: theme.colors.black100,
-    marginBottom: 10,
+    marginBottom: 15,
     borderRadius: 10,
     alignItems: 'center',
     flexDirection: 'row',
     overflow: 'hidden',
-    
+    minHeight: 50,
   },
 
   drinkTitle: {

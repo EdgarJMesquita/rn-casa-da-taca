@@ -55,6 +55,7 @@ export function TableMembers({ route, navigation }:TableMembersProps){
                     action={()=>navigation.navigate('MemberOrders',{ tableId: tableId, memberId: member.id })}
                     name={member.name} 
                     key={index}
+                    member={member}
                   />
                 ))
                 :

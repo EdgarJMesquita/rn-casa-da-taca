@@ -9,30 +9,32 @@ export const styles = StyleSheet.create({
     paddingBottom: 30,
   },
 
-  tableLabel: {
+  label: {
     width: '100%', 
     height: 50, 
     backgroundColor: theme.colors.primary,
-    justifyContent: 'center'
+    justifyContent: 'center',
+    alignItems: 'center'
   },
 
   title: {
     fontFamily: theme.fonts.Roboto_700,
     fontSize: 22,
     color: theme.colors.text,
-    textAlign: 'center',
     letterSpacing: 0.30,
-    marginBottom: 5
+    marginLeft: 25,
+    marginTop: 25,
+    marginBottom: 10
   },
 
-  
-
   subtitle: {
-    fontFamily: theme.fonts.Roboto_700,
+    fontFamily: theme.fonts.Roboto_400,
     fontSize: 18,
     color: theme.colors.text,
-    marginBottom: 20,
-    letterSpacing: 0.30
+    marginBottom: 10,
+    marginTop: 10,
+    letterSpacing: 0.30,
+    marginLeft: 2
   },
 
   noMembersMessage: {

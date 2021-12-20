@@ -10,6 +10,7 @@ import { Entypo, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icon
 import { drawerItemStyles } from './drawerItemStyles';
 import { AttendanceRoutes } from './attendance.routes';
 import { Kitchen } from '../screens/Kitchen';
+import { Cashier } from '../screens/Cashier';
 
 const Drawer = createDrawerNavigator();
 const Stack = createNativeStackNavigator();
@@ -22,17 +23,8 @@ function DrawerRoutes(){
         overlayColor: theme.colors.black100
       }}
       drawerContent={CustomDrawer}
-    >
-      <Drawer.Screen 
-        name="Attendance"
-        component={AttendanceRoutes}
-        options={{
-          drawerIcon: (props)=><MaterialCommunityIcons name="table-furniture" color="#FFFFFF" size={22} />,
-          title: 'Mesas',
-          ...drawerItemStyles,
-        }}
-      />
-
+      >
+      
       <Drawer.Screen 
         name="Menu"
         component={Menu}
@@ -42,6 +34,17 @@ function DrawerRoutes(){
           ...drawerItemStyles,
         }}
       />
+      
+      <Drawer.Screen 
+        name="Attendance"
+        component={AttendanceRoutes}
+        options={{
+          drawerIcon: (props)=><MaterialCommunityIcons name="table-furniture" color="#FFFFFF" size={22} />,
+          title: 'Mesas',
+          ...drawerItemStyles,
+        }}
+      />
+      
       <Drawer.Screen 
         name="Kitchen"
         component={Kitchen}
@@ -51,9 +54,10 @@ function DrawerRoutes(){
           ...drawerItemStyles,
         }}
       />
+
       <Drawer.Screen 
         name="Cashier"
-        component={Kitchen}
+        component={Cashier}
         options={{
           drawerIcon: (props)=><MaterialIcons name="attach-money" color="#FFFFFF" size={22}/>,
           title: 'Caixa',

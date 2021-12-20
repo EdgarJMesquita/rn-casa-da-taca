@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { ScrollView, Text, View } from 'react-native';
 import { Background } from '../../components/Background';
 import { styles } from './styles';
@@ -7,53 +7,52 @@ import { useOrders } from '../../hooks/useOrders';
 import { StackScreensProps } from '../../routes/types';
 
 export function Kitchen({ route, navigation }:StackScreensProps){
-  const { tables } = useOrders();
+  const { tables, updateOrder } = useOrders();
 
-  async function handleDeleteOrder(orderId:string){
-
+  function handleFinishOrder(tableId: string, memberId: string, orderId: string){
+    updateOrder(tableId, memberId, orderId, 'done');
   }
+
+  const user:string = 'Milena';
 
   return (
     <Background>
-      <ScrollView style={{flex: 1, width: '100%'}}>
+      <Text style={styles.title}>
+        Novos Pedidos
+      </Text>
+      <ScrollView 
+        style={{flex: 1, width: '100%'}}
+        contentContainerStyle={{paddingHorizontal: 25, paddingBottom: 25}}
+        showsVerticalScrollIndicator={false}
+        fadingEdgeLength={100}
+      >
         {
           tables?.map((table, index)=>(
-            table?.members?.length!==0 &&
-              <View key={index}>
-                <View style={styles.tableLabel}>
-                  <Text style={styles.title}>
-                    Mesa {table?.name}
-                  </Text>
-                </View>
-                <View style={styles.container}>
-                  <View style={{flex: 1, width: '100%', justifyContent: 'center', alignItems: 'center'}}>
-                    {
-                      table?.members?.map((member, index)=>(
-                        <View key={index}>
-                          {
-                            member.orders.length>0 &&
-                            <Text style={styles.subtitle}>
-                              {member.name}
-                            </Text>
-                          }
-                          {
-                            member.orders.map((order, index)=>{
-                              if(order.type==='drink')return null;
-                              return(
-                                <OrderCard
-                                  order={order}
-                                  key={index}
-                                  deleteOrder={()=>handleDeleteOrder(order.id)}
-                                />
-                              )
-                            })
-                          }
-                        </View>
-                      ))
-                    }
-                  </View>
-                </View>
+            table?.members?.length!==0?
+              table?.members?.map((member, index)=>(
+                member.orders.map((order, index)=>{
+                  if(order.type==='drink' || order.status==='done' || order.status==='paid') return null;
+                  return(
+                    <View style={{width: '100%'}} key={index}>
+                      <Text style={styles.subtitle}>
+                        {`Mesa ${table.name} > ${member.name}`}
+                      </Text>
+                      <OrderCard
+                        order={order}
+                        actionName={user==='Milena'? 'Finalizar':''}
+                        action={()=>handleFinishOrder(table.id, member.id, order.id)}
+                      />
+                    </View>
+                  )
+                })
+              ))
+            :(
+              <View style={{width: '100%', height: 500, justifyContent: 'center'}}>
+                <Text style={styles.noMembersMessage}>
+                  Não há pedidos
+                </Text>
               </View>
+            )
           ))
         }
       </ScrollView>

@@ -30,9 +30,8 @@ export const styles = StyleSheet.create({
 
   subtitle: {
     fontFamily: theme.fonts.Roboto_700,
-    fontSize: 18,
+    fontSize: 25,
     color: theme.colors.text,
-    marginBottom: 20,
     letterSpacing: 0.30
   },
 
@@ -42,5 +41,19 @@ export const styles = StyleSheet.create({
     color: theme.colors.text,
     marginBottom: 20,
     textAlign: 'center',
+  },
+
+  subtotal: {
+    fontFamily: theme.fonts.Roboto_400,
+    fontSize: 15,
+    color: theme.colors.text,
+    marginRight: 10,
+    marginTop: 2
+  },
+  
+  subtotalNumber: {
+    fontFamily: theme.fonts.Roboto_700,
+    fontSize: 25,
+    color: theme.colors.text
   }
 });

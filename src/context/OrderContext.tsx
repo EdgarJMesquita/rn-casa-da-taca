@@ -1,6 +1,6 @@
 import React from 'react';
 import { createContext, ReactNode, useEffect, useState } from "react";
-import { onValue, ref, off, push } from "firebase/database";
+import { onValue, ref, off, push, update } from "firebase/database";
 import { database } from "../service/database";
 
 export type OrderProps = {
@@ -12,9 +12,10 @@ export type OrderProps = {
   observation: string;
   price: string;
   type: 'cup'|'ship'|'drink';
+  status?: 'done'|'paid';
 }
 
-type MemberProps = {
+export type MemberProps = {
   id: string;
   name: string;
   orders: OrderProps[];
@@ -46,6 +47,7 @@ type OrdersContextProps = {
   addMember: (tableId: string, memberName: string)=>Promise<string|null>;
   addOrder: (tableId: string, memberId: string, order: NewOrderProps)=>Promise<string|null>;
   deleteOrder: (tableId: string, memberId: string, orderId:string)=>void;
+  updateOrder: (tableId: string, memberId: string, orderId:string, status: 'done'|'paid')=>Promise<void>;
 }
 
 type DatabaseOrderProps = {
@@ -56,7 +58,8 @@ type DatabaseOrderProps = {
     secondFlavor: string;
     observation: string;
     price: string;
-    type: 'cup'|'ship'|'drink'
+    type: 'cup'|'ship'|'drink';
+    status?: 'done'|'paid';
   }
 }
 
@@ -120,6 +123,16 @@ export function OrdersContextProvider({children}:OrdersContextProviderProps){
   async function deleteOrder(tableId: string, memberId: string, orderId:string) {
     console.log({tableId, memberId, orderId})
   }
+  async function updateOrder(tableId: string, memberId: string, orderId:string, status: string) {
+    try {
+      const orderRef = ref(database, `tables/${tableId}/members/${memberId}/orders/${orderId}`);
+      await update(orderRef, { status });
+      console.log('Atualizado com sucesso para '+status);
+
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   useEffect(()=>{
     const tableRef = ref(database, 'tables');
@@ -160,6 +173,7 @@ export function OrdersContextProvider({children}:OrdersContextProviderProps){
       createTable,
       addMember,
       addOrder,
+      updateOrder,
       deleteOrder
     }}>
       {children}
