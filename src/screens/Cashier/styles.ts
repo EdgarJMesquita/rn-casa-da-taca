@@ -13,7 +13,13 @@ export const styles = StyleSheet.create({
     width: '100%', 
     flexDirection: 'row', 
     alignItems: 'center', 
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
+  },
+
+  line: {
+    borderTopWidth: 1,
+    borderTopColor: theme.colors.text,
+    borderRadius: 2
   },
 
   resume: {
@@ -41,6 +47,13 @@ export const styles = StyleSheet.create({
   },
 
   total: {
+    fontFamily: theme.fonts.Roboto_400,
+    color: theme.colors.text,
+    fontSize: 22,
+    marginTop: 1
+  },
+
+  totalValue: {
     fontFamily: theme.fonts.Ubuntu500,
     color: theme.colors.text,
     fontSize: 25,
@@ -49,7 +62,8 @@ export const styles = StyleSheet.create({
   subLabel: {
     fontFamily: theme.fonts.Roboto_400,
     color: theme.colors.text,
-    fontSize: 15
+    fontSize: 15,
+    marginTop: 1
   },
 
   subtitle: {
@@ -61,8 +75,25 @@ export const styles = StyleSheet.create({
   header: {
     fontFamily: theme.fonts.Roboto_700,
     color: theme.colors.text,
-    fontSize: 25,
-    marginTop: 20,
+    fontSize: 20,
+    marginTop: 25,
     marginBottom: 5
+  },
+
+  button: {
+    width: '100%',
+    height: 50,
+    backgroundColor: theme.colors.primary,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 30
+  },
+
+  buttonTitle: {
+    fontFamily: theme.fonts.Roboto_700,
+    color: theme.colors.text,
+    fontSize: 20,
+    letterSpacing: 0.40
   }
 });

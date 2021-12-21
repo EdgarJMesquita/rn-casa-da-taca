@@ -1,7 +1,9 @@
 import React from 'react';
 import { createContext, ReactNode, useEffect, useState } from "react";
-import { onValue, ref, off, push, update } from "firebase/database";
+import { onValue, ref, off, push, update, set, remove, onChildAdded } from "firebase/database";
 import { database } from "../service/database";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Notifications from 'expo-notifications';
 
 export type OrderProps = {
   id: string;
@@ -23,6 +25,7 @@ export type MemberProps = {
 
 export type TableProps = {
   name: string;
+  attendant: string;
   id: string;
   members?: MemberProps[];
 }
@@ -42,12 +45,15 @@ type NewOrderProps = {
 }
 
 type OrdersContextProps = {
+  user: string;
   tables: TableProps[]|undefined;
+  setUser: (user:string)=>void;
   createTable: (tableName: string)=>Promise<string|null>;
   addMember: (tableId: string, memberName: string)=>Promise<string|null>;
   addOrder: (tableId: string, memberId: string, order: NewOrderProps)=>Promise<string|null>;
   deleteOrder: (tableId: string, memberId: string, orderId:string)=>void;
   updateOrder: (tableId: string, memberId: string, orderId:string, status: 'done'|'paid')=>Promise<void>;
+  closeDay: (report: OrderProps[])=>Promise<boolean>;
 }
 
 type DatabaseOrderProps = {
@@ -72,6 +78,7 @@ type DatabaseMembersProps = {
 
 type DatabaseTableProps = {
   name: string;
+  attendant: string;
   members?:  DatabaseMembersProps;
 }
 
@@ -79,15 +86,26 @@ type OrderDatabaseProps = {
   [key:string]: DatabaseTableProps;
 }
 
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
+
 export const OrdersContext = createContext({}as OrdersContextProps);
 
 export function OrdersContextProvider({children}:OrdersContextProviderProps){
   const [ tables, setTables ] = useState<TableProps[]|undefined>();
+  const [ user, setUser ] = useState('');
 
   async function createTable(tableName: string) {
+    if(!user) return null;
+
     try {
       const tableRef = ref(database, 'tables');
-      const response = await push(tableRef, { name: tableName })
+      const response = await push(tableRef, { name: tableName, attendant: user })
       return response.key;
 
     } catch (error) {
@@ -123,6 +141,7 @@ export function OrdersContextProvider({children}:OrdersContextProviderProps){
   async function deleteOrder(tableId: string, memberId: string, orderId:string) {
     console.log({tableId, memberId, orderId})
   }
+
   async function updateOrder(tableId: string, memberId: string, orderId:string, status: string) {
     try {
       const orderRef = ref(database, `tables/${tableId}/members/${memberId}/orders/${orderId}`);
@@ -134,7 +153,48 @@ export function OrdersContextProvider({children}:OrdersContextProviderProps){
     }
   }
 
+  async function closeDay(report: OrderProps[]) {
+    const currentDate = new Date();
+    const day = currentDate.getDate();
+    const month = currentDate.getMonth()+1;
+    const year = currentDate.getFullYear();
+    
+    try {
+      const historyRef = ref(
+        database, 
+        `history/${year}/${month}/${day}`
+      );
+      await set(historyRef, report);
+      
+      const tableRef = ref(database, 'tables');
+      await remove(tableRef);
+      
+      return true;
+    } catch (error) {
+      console.log(error);
+      return false
+    }
+
+
+  }
+
   useEffect(()=>{
+    async function fetchUserFromAsyncStorage() {
+      try {
+        const store = await AsyncStorage.getItem('@user');
+        if(store){
+          setUser(store);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    fetchUserFromAsyncStorage();
+  },[]);
+
+  useEffect(()=>{
+    if(!user) return;
+
     const tableRef = ref(database, 'tables');
     onValue(tableRef,(dataSnapshot)=>{
       if(!dataSnapshot.exists()){
@@ -147,6 +207,7 @@ export function OrdersContextProvider({children}:OrdersContextProviderProps){
       .map(([tableKey, table])=>({
           id: tableKey,
           name: table.name,
+          attendant: table.attendant,
           members: table.members? 
             Object.entries(table.members)
             .map(([memberKey,member])=>({
@@ -165,16 +226,53 @@ export function OrdersContextProvider({children}:OrdersContextProviderProps){
     return()=>{
       off(tableRef);
     }
-  },[]);
+  },[user]);
+
+  useEffect(()=>{
+    if(!user || user!=='Milena') return;
+
+    const tablesRef = ref(database, 'tables')
+    onChildAdded(tablesRef,(databaseSnapshot)=>{
+      if(!databaseSnapshot.exists()) return;
+
+      const newOrders:OrderProps[] = [];
+
+      tables?.forEach(table=>{
+        table.members?.forEach(member=>{
+          member.orders?.forEach(order=>{
+            if(!order.status){
+              newOrders.push(order);
+            }
+          })
+        })
+      });
+
+      Notifications.scheduleNotificationAsync({
+        content: {
+          title: `${newOrders?.length} Novos pedidos`,
+          body: `Pedido ${newOrders[0]?.name}.`
+        },
+        trigger: {
+          seconds: 1
+        }
+      })
+    })
+    return()=>{
+      off(tablesRef);
+    }
+  },[user]);
 
   return(
     <OrdersContext.Provider value={{
+      user,
       tables,
+      setUser,
       createTable,
       addMember,
       addOrder,
       updateOrder,
-      deleteOrder
+      deleteOrder,
+      closeDay
     }}>
       {children}
     </OrdersContext.Provider>

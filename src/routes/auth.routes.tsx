@@ -11,11 +11,13 @@ import { drawerItemStyles } from './drawerItemStyles';
 import { AttendanceRoutes } from './attendance.routes';
 import { Kitchen } from '../screens/Kitchen';
 import { Cashier } from '../screens/Cashier';
+import { useOrders } from '../hooks/useOrders';
 
 const Drawer = createDrawerNavigator();
 const Stack = createNativeStackNavigator();
 
 function DrawerRoutes(){
+  const { user } = useOrders();
   return(
     <Drawer.Navigator
       screenOptions={{
@@ -51,7 +53,16 @@ function DrawerRoutes(){
         options={{
           drawerIcon: (props)=><MaterialIcons name="kitchen" color="#FFFFFF" size={22} />,
           title: 'Cozinha',
+
           ...drawerItemStyles,
+          drawerItemStyle: {
+            width: 250,
+            height: 50,
+            paddingHorizontal: 20,
+            borderRadius: 5,
+            display: user==='Milena'?'flex':'none'
+          }
+          
         }}
       />
 
@@ -62,6 +73,13 @@ function DrawerRoutes(){
           drawerIcon: (props)=><MaterialIcons name="attach-money" color="#FFFFFF" size={22}/>,
           title: 'Caixa',
           ...drawerItemStyles,
+          drawerItemStyle: {
+            width: 250,
+            height: 50,
+            paddingHorizontal: 20,
+            borderRadius: 5,
+            display: user==='Venilson'?'flex':'none'
+          }
         }}
       />
      
@@ -70,6 +88,7 @@ function DrawerRoutes(){
 }
 
 export function AuthRoutes(){
+  const { user } = useOrders();
   return(
     <Stack.Navigator
       screenOptions={{
@@ -79,14 +98,20 @@ export function AuthRoutes(){
         }
       }}
     >
-      <Stack.Screen 
-        name="DrawerRoutes"
-        component={DrawerRoutes}
-      />
-      <Stack.Screen 
-        name="Login"
-        component={Login}
-      />
+      {
+        user?(
+          <Stack.Screen 
+            name="DrawerRoutes"
+            component={DrawerRoutes}
+          />
+
+        ):(
+          <Stack.Screen 
+            name="Login"
+            component={Login}
+          />
+        )
+      }
     </Stack.Navigator>
   );
 }

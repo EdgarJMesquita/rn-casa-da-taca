@@ -12,7 +12,7 @@ import { StackScreensProps } from '../../routes/types';
 
 export function Tables({navigation}:StackScreensProps){
   const [ isVisible, setVisible ] = useState(false);
-  const { tables, createTable } = useOrders();
+  const { user, tables, createTable } = useOrders();
   const [ newTableName, setNewTableName ] = useState('');
 
   async function handleCreateTable() {
@@ -37,7 +37,8 @@ export function Tables({navigation}:StackScreensProps){
         <ScrollView style={{flex: 1, width: '100%'}}>
           { tables?
             tables.length>0?
-            tables.map((table,index)=>(
+            tables.filter(item=>item.attendant===user)
+            .map((table,index)=>(
               <TableCard 
                 table={table}
                 action={()=>navigation.navigate('TableMembers', { tableId: table.id })}

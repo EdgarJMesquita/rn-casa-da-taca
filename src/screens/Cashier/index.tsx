@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
+import { RectButton } from 'react-native-gesture-handler';
 import { Background } from '../../components/Background';
+import { ConfirmModal } from '../../components/ConfirmModal';
 import { OrderProps } from '../../context/OrderContext';
 import { useOrders } from '../../hooks/useOrders';
 import { styles } from './styles';
@@ -12,8 +14,24 @@ export function Cashier(){
   const year = currentDate.getFullYear();
   const [ orders, setOrders ] = useState<OrderProps[]>([]);
   const [ members, setMembers ] = useState<string[]>([]);
-  const { tables } = useOrders();
-  
+  const { tables, closeDay } = useOrders();
+  const [ isVisible, setVisible ] = useState(false);
+  const [ isLoading, setLoading ] = useState(false);
+
+  async function handleCloseDay() {
+    try {
+      setVisible(false);
+      setLoading(true);
+      await closeDay(orders);
+
+    } catch (error) {
+      console.log(error);
+      
+    } finally {
+      setLoading(false);
+    }
+  }
+
   useEffect(()=>{    
     const _allOrders:OrderProps[] = [];
     const _allMembers:string[] = [];
@@ -37,7 +55,12 @@ export function Cashier(){
   return (
     <Background>
       <View style={styles.container}>
-        <ScrollView style={{width: '100%'}} contentContainerStyle={{alignItems: 'center'}}>
+        <ScrollView 
+          style={{width: '100%'}} 
+          showsVerticalScrollIndicator={false}
+          fadingEdgeLength={100}
+          contentContainerStyle={{paddingBottom: 50}}
+        >
           <View style={{marginBottom: 10, alignItems: 'center', width: '100%'}}>
             <Text style={styles.resume}>
               Resumo do dia 
@@ -48,8 +71,8 @@ export function Cashier(){
           </View>
 
           <View style={{marginTop: 10}}>
-            <View style={{flexDirection: 'row'}}>
-              <Text style={[styles.title, {marginLeft: 10}]}>
+            <View style={{flexDirection: 'row', justifyContent: 'center'}}>
+              <Text style={styles.title}>
                 {members.length}
               </Text>
               <Text style={styles.label}>
@@ -61,7 +84,6 @@ export function Cashier(){
           <Text style={styles.header}>
             Taças
           </Text>
-
           {
             [...new Set(orders.filter(item=>item.type==='cup').map(item=>item.name))].map((name, index)=>(
               <View style={[styles.section, { marginTop: 10 }]} key={index}>
@@ -87,18 +109,18 @@ export function Cashier(){
 
           <View style={[styles.section, { marginTop: 10 }]}>
             <View style={{flexDirection: 'row'}}>
-              <Text style={styles.label}>
+              <Text style={styles.subLabel}>
                 Total:
               </Text>
-              <Text style={[styles.title, {marginLeft: 10}]}>
+              <Text style={[styles.subtitle, {marginLeft: 10}]}>
                 {orders.filter(item=>item.type==='cup').length}
               </Text>
             </View>
             <View style={{flexDirection: 'row'}}>
-              <Text style={styles.label}>
+              <Text style={styles.subLabel}>
                 R$
               </Text>
-              <Text style={[styles.title, {marginLeft: 10}]}>
+              <Text style={[styles.subtitle, {marginLeft: 10}]}>
                 {(orders.filter(item=>item.type==='cup')?.reduce((a,b)=>a+parseFloat(b.price),0)).toFixed(2)}
               </Text>
             </View>
@@ -107,7 +129,6 @@ export function Cashier(){
           <Text style={styles.header}>
             Barcas
           </Text>
-
           {
             [...new Set(orders.filter(item=>item.type==='ship').map(item=>item.name))].map((name, index)=>(
               <View style={[styles.section, { marginTop: 10 }]} key={index}>
@@ -133,18 +154,18 @@ export function Cashier(){
 
           <View style={styles.section}>
             <View style={{flexDirection: 'row'}}>
-              <Text style={styles.label}>
+              <Text style={styles.subLabel}>
                 Total:
               </Text>
-              <Text style={[styles.title, {marginLeft: 10}]}>
+              <Text style={[styles.subtitle, {marginLeft: 10}]}>
                 {orders.filter(item=>item.type==='ship').length}
               </Text>
             </View>
             <View style={{flexDirection: 'row'}}>
-              <Text style={styles.label}>
+              <Text style={styles.subLabel}>
                 R$
               </Text>
-              <Text style={[styles.title, {marginLeft: 10}]}>
+              <Text style={[styles.subtitle, {marginLeft: 10}]}>
                 {(orders.filter(item=>item.type==='ship')?.reduce((a,b)=>a+parseFloat(b.price),0)).toFixed(2)}
               </Text>
             </View>
@@ -153,21 +174,20 @@ export function Cashier(){
           <Text style={styles.header}>
             Águas
           </Text>
-
           <View style={styles.section}>
             <View style={{flexDirection: 'row'}}>
-              <Text style={styles.label}>
+              <Text style={styles.subLabel}>
                 Total:
               </Text>
-              <Text style={[styles.title, {marginLeft: 10}]}>
+              <Text style={[styles.subtitle, {marginLeft: 10}]}>
                 {orders.filter(item=>item.name==='Água').length}
               </Text>
             </View>
             <View style={{flexDirection: 'row'}}>
-              <Text style={styles.label}>
+              <Text style={styles.subLabel}>
                 R$
               </Text>
-              <Text style={[styles.title, {marginLeft: 10}]}>
+              <Text style={[styles.subtitle, {marginLeft: 10}]}>
                 {(orders.filter(item=>item.name==='Água')?.reduce((a,b)=>a+parseFloat(b.price),0)).toFixed(2)}
               </Text>
             </View>
@@ -176,39 +196,52 @@ export function Cashier(){
           <Text style={styles.header}>
             Águas com gás
           </Text>
-
           <View style={styles.section}>
             <View style={{flexDirection: 'row'}}>
-              <Text style={styles.label}>
+              <Text style={styles.subLabel}>
                 Total:
               </Text>
-              <Text style={[styles.title, {marginLeft: 10}]}>
+              <Text style={[styles.subtitle, {marginLeft: 10}]}>
                 {orders.filter(item=>item.name==='Água com gás').length}
               </Text>
             </View>
             <View style={{flexDirection: 'row'}}>
-              <Text style={styles.label}>
+              <Text style={styles.subLabel}>
                 R$
               </Text>
-              <Text style={[styles.title, {marginLeft: 10}]}>
+              <Text style={[styles.subtitle, {marginLeft: 10}]}>
                 {(orders.filter(item=>item.name==='Água com gás')?.reduce((a,b)=>a+parseFloat(b.price),0)).toFixed(2)}
               </Text>
             </View>
           </View>
 
-          <View style={{width: '100%', marginTop: 30}}>
+          <View style={{width: '100%', marginTop: 50}}>
             <View style={{flexDirection: 'row', width: '100%', alignItems: 'center', justifyContent: 'flex-end'}}>
-              <Text style={styles.label}>
+              <Text style={styles.total}>
                 Total:
               </Text>
-              <Text style={styles.total}>
+              <Text style={styles.totalValue}>
                 {' '}R${(orders.reduce((a,b)=>a+Number(b.price),0)).toFixed(2)}
               </Text>
             </View>
           </View>
 
+          <RectButton 
+            style={styles.button}
+            onPress={()=>!isLoading && setVisible(true)}
+          >
+            <Text style={styles.buttonTitle}>
+              Encerrar venda
+            </Text>
+          </RectButton>
+
         </ScrollView>
       </View>
+      <ConfirmModal 
+        isVisible={isVisible}
+        action={handleCloseDay}
+        closeModal={()=>setVisible(false)}
+      />
     </Background>
   );
 }
