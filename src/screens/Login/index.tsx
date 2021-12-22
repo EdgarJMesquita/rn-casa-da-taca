@@ -43,6 +43,7 @@ export function Login(){
 
     } catch (error) {
       console.log(error);
+      alert(error);
       
     } finally {
       setLoading(false);

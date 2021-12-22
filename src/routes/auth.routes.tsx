@@ -60,7 +60,7 @@ function DrawerRoutes(){
             height: 50,
             paddingHorizontal: 20,
             borderRadius: 5,
-            display: user?.uid==='4s2VROZeAdd5HlJFj18imS4i7hh2'?'flex':'none'
+            display: (user?.uid==='4s2VROZeAdd5HlJFj18imS4i7hh2' || user?.uid==='WlbQiG4RCSeKrNkqSpMvhZWlByE2')?'flex':'none'
           }
           
         }}
@@ -78,7 +78,7 @@ function DrawerRoutes(){
             height: 50,
             paddingHorizontal: 20,
             borderRadius: 5,
-            display: user?.uid==='4s2VROZeAdd5HlJFj18imS4i7hh2'?'flex':'none'
+            display: (user?.uid==='4s2VROZeAdd5HlJFj18imS4i7hh2' || user?.uid==='WlbQiG4RCSeKrNkqSpMvhZWlByE2')?'flex':'none'
           }
         }}
       />

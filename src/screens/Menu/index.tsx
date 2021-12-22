@@ -2,6 +2,8 @@ import React from 'react';
 import { ScrollView, View, Text, ImageBackground } from 'react-native';
 import { Background } from '../../components/Background';
 import Lisboa from '../../assets/lisboa.png';
+import Bogota from '../../assets/bogota.png';
+import Helsinki from '../../assets/helsinki.png';
 import { styles } from './styles';
 
 
@@ -12,12 +14,12 @@ const data = [
     size330: '330 ml  R$ 18.50'
   },
   {
-    source: Lisboa,
+    source: Bogota,
     size250: '250 ml  R$ 15.50',
     size330: '330 ml  R$ 18.50'
   },
   {
-    source: Lisboa,
+    source: Helsinki,
     size250: '250 ml  R$ 15.50',
     size330: '330 ml  R$ 18.50'
   },
@@ -40,14 +42,14 @@ export function Menu(){
                 style={{height: 400, width: '100%', borderRadius: 5, marginBottom: 20}}
                 resizeMode="contain"
               >
-                <View style={styles.priceContainer}>
+                {/* <View style={styles.priceContainer}>
                   <Text style={styles.price}>
                     {item.size250}
                   </Text>
                   <Text style={styles.price}>
                     {item.size330}
                   </Text>
-                </View>
+                </View> */}
               </ImageBackground>
             ))
           }

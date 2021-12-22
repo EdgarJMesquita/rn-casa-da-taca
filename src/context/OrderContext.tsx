@@ -253,7 +253,7 @@ export function OrdersContextProvider({children}:OrdersContextProviderProps){
         })
       });
 
-      Notifications.scheduleNotificationAsync({
+     0 && Notifications.scheduleNotificationAsync({
         content: {
           title: `${newOrders?.length} Novos pedidos`,
           body: `Pedido ${newOrders[0]?.name}.`
