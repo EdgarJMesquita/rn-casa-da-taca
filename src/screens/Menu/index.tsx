@@ -2,8 +2,8 @@ import React from 'react';
 import { ScrollView, View, Text, ImageBackground } from 'react-native';
 import { Background } from '../../components/Background';
 import Lisboa from '../../assets/lisboa.png';
-import Bogota from '../../assets/bogota.png';
-import Helsinki from '../../assets/helsinki.png';
+import Bogota from '../../assets/bogota.jpg';
+import Helsinki from '../../assets/helsinki.jpg';
 import { styles } from './styles';
 
 
