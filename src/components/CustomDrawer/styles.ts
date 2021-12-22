@@ -22,12 +22,13 @@ export const styles = StyleSheet.create({
   userInitials: {
     fontFamily: theme.fonts.Roboto_700,
     color: theme.colors.text,
+    fontSize: 20
   },
 
   username: {
     fontFamily: theme.fonts.Roboto_700,
     color: theme.colors.text,
-    marginTop: 10,
+    marginTop: 20,
     fontSize: 20
   }
 });

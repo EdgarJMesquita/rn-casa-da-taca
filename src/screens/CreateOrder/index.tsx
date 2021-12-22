@@ -12,7 +12,6 @@ import { CreateOrderProps } from '../../routes/types';
 
 export function CreateOrder({route, navigation}:CreateOrderProps){
   const { selectedMenuItem, memberId, tableId } = route.params;
-
   const [ size, setSize ] = useState<number>(0);
   const [ firstFlavor, setFirstFlavor ] = useState('');
   const [ secondFlavor, setSecondFlavor ] = useState('');

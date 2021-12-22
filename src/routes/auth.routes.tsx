@@ -24,7 +24,7 @@ function DrawerRoutes(){
         header: (props)=><Header {...props} />,
         overlayColor: theme.colors.black100
       }}
-      drawerContent={CustomDrawer}
+      drawerContent={(props)=><CustomDrawer {...props} email={user?.email} />}
       >
       
       <Drawer.Screen 
@@ -60,7 +60,7 @@ function DrawerRoutes(){
             height: 50,
             paddingHorizontal: 20,
             borderRadius: 5,
-            display: user==='Milena'?'flex':'none'
+            display: user?.uid==='4s2VROZeAdd5HlJFj18imS4i7hh2'?'flex':'none'
           }
           
         }}
@@ -78,7 +78,7 @@ function DrawerRoutes(){
             height: 50,
             paddingHorizontal: 20,
             borderRadius: 5,
-            display: user==='Venilson'?'flex':'none'
+            display: user?.uid==='4s2VROZeAdd5HlJFj18imS4i7hh2'?'flex':'none'
           }
         }}
       />
@@ -99,7 +99,7 @@ export function AuthRoutes(){
       }}
     >
       {
-        user?(
+        user?.uid?(
           <Stack.Screen 
             name="DrawerRoutes"
             component={DrawerRoutes}

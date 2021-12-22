@@ -1,19 +1,45 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 import { Background } from '../../components/Background';
 import { styles } from './styles';
 import { OrderCard } from '../../components/OrderCard';
 import { useOrders } from '../../hooks/useOrders';
 import { StackScreensProps } from '../../routes/types';
+import { OrderProps } from '../../context/OrderContext';
+
+type NewOrdersProps = OrderProps & {
+  table: string;
+  client: string;
+}
 
 export function Kitchen({ route, navigation }:StackScreensProps){
-  const { tables, updateOrder } = useOrders();
+  const { user, tables, updateOrder } = useOrders();
+  const [ newOrders, setNewOrders ] = useState<NewOrdersProps[]>();
+
+  const uid = '4s2VROZeAdd5HlJFj18imS4i7hh2';
 
   function handleFinishOrder(tableId: string, memberId: string, orderId: string){
     updateOrder(tableId, memberId, orderId, 'done');
   }
 
-  const user:string = 'Milena';
+  /* useEffect(()=>{
+    const _newOrders:NewOrdersProps[] = [];
+    
+    tables?.forEach(table=>{
+      table.members?.forEach(member=>{
+        member.orders.forEach(order=>{
+          if(order.status!=='paid' || order.status!=='paid'){
+            _newOrders.push({
+              ...order,
+              table: '',
+              client: ''
+            });
+          }
+        })
+      })
+    });
+    setNewOrders(_newOrders);
+  },[]); */
 
   return (
     <Background>
@@ -39,7 +65,7 @@ export function Kitchen({ route, navigation }:StackScreensProps){
                       </Text>
                       <OrderCard
                         order={order}
-                        actionName={user==='Milena'? 'Finalizar':''}
+                        actionName={user?.uid===uid? 'Finalizar':''}
                         action={()=>handleFinishOrder(table.id, member.id, order.id)}
                       />
                     </View>

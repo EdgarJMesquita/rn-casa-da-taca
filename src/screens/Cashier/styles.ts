@@ -17,9 +17,10 @@ export const styles = StyleSheet.create({
   },
 
   line: {
-    borderTopWidth: 1,
+    borderTopWidth: 0.2,
     borderTopColor: theme.colors.text,
-    borderRadius: 2
+    borderRadius: 2,
+    paddingTop: 5
   },
 
   resume: {

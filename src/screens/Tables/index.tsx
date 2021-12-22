@@ -15,6 +15,8 @@ export function Tables({navigation}:StackScreensProps){
   const { user, tables, createTable } = useOrders();
   const [ newTableName, setNewTableName ] = useState('');
 
+  const filteredTables = tables?.filter(item=>item.attendant===user?.uid);
+
   async function handleCreateTable() {
     if(!newTableName) return;
     if(tables?.map(item=>item.name).includes(newTableName)) return;
@@ -35,9 +37,9 @@ export function Tables({navigation}:StackScreensProps){
           Mesas
         </Text>
         <ScrollView style={{flex: 1, width: '100%'}}>
-          { tables?
-            tables.length>0?
-            tables.filter(item=>item.attendant===user)
+          { filteredTables?
+            filteredTables.length>0?
+            filteredTables.filter(item=>item.attendant===user?.uid)
             .map((table,index)=>(
               <TableCard 
                 table={table}

@@ -1,9 +1,9 @@
 import React from 'react';
 import { createContext, ReactNode, useEffect, useState } from "react";
-import { onValue, ref, off, push, update, set, remove, onChildAdded } from "firebase/database";
+import { onValue, ref, off, push, update, set, remove, onChildAdded, get } from "firebase/database";
 import { database } from "../service/database";
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Notifications from 'expo-notifications';
+import { User } from '../screens/Login';
 
 export type OrderProps = {
   id: string;
@@ -45,15 +45,16 @@ type NewOrderProps = {
 }
 
 type OrdersContextProps = {
-  user: string;
+  user: User|undefined;
   tables: TableProps[]|undefined;
-  setUser: (user:string)=>void;
+  setUser: (user:User)=>void;
   createTable: (tableName: string)=>Promise<string|null>;
   addMember: (tableId: string, memberName: string)=>Promise<string|null>;
   addOrder: (tableId: string, memberId: string, order: NewOrderProps)=>Promise<string|null>;
   deleteOrder: (tableId: string, memberId: string, orderId:string)=>void;
   updateOrder: (tableId: string, memberId: string, orderId:string, status: 'done'|'paid')=>Promise<void>;
   closeDay: (report: OrderProps[])=>Promise<boolean>;
+  fetchReport: (year: number, month: number, day: number)=>Promise<OrderProps[]|null>;
 }
 
 type DatabaseOrderProps = {
@@ -98,14 +99,14 @@ export const OrdersContext = createContext({}as OrdersContextProps);
 
 export function OrdersContextProvider({children}:OrdersContextProviderProps){
   const [ tables, setTables ] = useState<TableProps[]|undefined>();
-  const [ user, setUser ] = useState('');
+  const [ user, setUser ] = useState<User>();
 
   async function createTable(tableName: string) {
     if(!user) return null;
 
     try {
       const tableRef = ref(database, 'tables');
-      const response = await push(tableRef, { name: tableName, attendant: user })
+      const response = await push(tableRef, { name: tableName, attendant: user.uid })
       return response.key;
 
     } catch (error) {
@@ -178,23 +179,28 @@ export function OrdersContextProvider({children}:OrdersContextProviderProps){
 
   }
 
-  useEffect(()=>{
-    async function fetchUserFromAsyncStorage() {
-      try {
-        const store = await AsyncStorage.getItem('@user');
-        if(store){
-          setUser(store);
-        }
-      } catch (error) {
-        console.log(error);
+  async function fetchReport(year: number, month: number, day: number) {
+    try {
+      const historyRef = ref(
+        database, 
+        `history/${String(year).padStart(2,'0')}/${String(month).padStart(2,'0')}/${String(day).padStart(2,'0')}`
+      );
+      const store = await get(historyRef);
+      const history:OrderProps[] = store.val();
+
+      if(history){
+        return history;
       }
+      return null;
+
+    } catch (error) {
+      console.log(error);
+      return null;
     }
-    fetchUserFromAsyncStorage();
-  },[]);
+  }
 
   useEffect(()=>{
     if(!user) return;
-
     const tableRef = ref(database, 'tables');
     onValue(tableRef,(dataSnapshot)=>{
       if(!dataSnapshot.exists()){
@@ -229,7 +235,7 @@ export function OrdersContextProvider({children}:OrdersContextProviderProps){
   },[user]);
 
   useEffect(()=>{
-    if(!user || user!=='Milena') return;
+    if(!user) return;
 
     const tablesRef = ref(database, 'tables')
     onChildAdded(tablesRef,(databaseSnapshot)=>{
@@ -272,7 +278,8 @@ export function OrdersContextProvider({children}:OrdersContextProviderProps){
       addOrder,
       updateOrder,
       deleteOrder,
-      closeDay
+      closeDay,
+      fetchReport
     }}>
       {children}
     </OrdersContext.Provider>

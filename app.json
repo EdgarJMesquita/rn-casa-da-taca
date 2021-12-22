@@ -3,6 +3,7 @@
     "name": "Casa da Taça",
     "slug": "casadataca",
     "version": "1.0.0",
+    "jsEngine": "hermes",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {

@@ -1,49 +1,67 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TextInput, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native';
 import { RectButton } from 'react-native-gesture-handler';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { styles } from './styles';
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
 import { useOrders } from '../../hooks/useOrders';
+import { styles } from './styles';
+import { theme } from '../../global/theme';
 
-const credentials = [
-  {
-    username: 'Venilson',
-    password: '857612'
-  },
-  {
-    username: 'Cayke',
-    password: '549802'
-  },
-  {
-    username: 'Milena',
-    password: '842648'
-  },
-  {
-    username: 'Carol',
-    password: '915786'
-  },
-]
+const auth = getAuth();
+
+export type User = {
+  uid: string|null;
+  displayName: string|null;
+  email: string|null;
+  avatar: string|null;
+}
 
 export function Login(){
   const { setUser } = useOrders();
-  const [ username, setUsername ] = useState('');
+  const [ email, setEmail ] = useState('');
   const [ password, setPassword ] = useState('');
-
+  const [ isLoading, setLoading ] = useState(false);
+  
   async function handleLogin() {
-    if(!username || !password) return;
-
-    const credential = credentials.find(item=>item.username===username && item.password===password);
-
-    if(!credential?.username) return;
+    if(!email || !password) return;
 
     try {
-      await AsyncStorage.setItem('@user', credential?.username);
-      setUser(credential.username);
+      setLoading(true);
+      const { user } = await signInWithEmailAndPassword(auth, email, password);
+      console.log(user);
+      if(!user) return;
+
+      const _user = {
+        uid: user.uid,
+        displayName: user.displayName,
+        email: user.email,
+        avatar: user.photoURL
+      }
+      await AsyncStorage.setItem('@uid', JSON.stringify(_user));
+
+      setUser(_user);
 
     } catch (error) {
       console.log(error);
+      
+    } finally {
+      setLoading(false);
     }
   }
+
+  useEffect(()=>{
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        const _user = {
+          uid: user.uid,
+          displayName: user.displayName,
+          email: user.email,
+          avatar: user.photoURL
+        }
+        setUser(_user);
+      }
+    });
+  },[]);
 
   return (
     <KeyboardAvoidingView 
@@ -55,11 +73,12 @@ export function Login(){
       </Text>
 
       <TextInput 
-        value={username}
-        onChangeText={setUsername}
+        value={email}
+        onChangeText={setEmail}
         placeholder="Digite seu usuário..."
         placeholderTextColor="#646466"
         style={styles.input}
+        keyboardType="email-address"
       />
       <TextInput 
         value={password}
@@ -67,15 +86,22 @@ export function Login(){
         placeholder="Digite sua senha..."
         placeholderTextColor="#646466"
         style={styles.input}
+        keyboardType="default"
+        secureTextEntry={true}
       />
 
       <RectButton
         style={styles.button}
         onPress={handleLogin}
       >
-        <Text style={styles.buttonTitle}>
-          Login
-        </Text>
+        {
+          !isLoading?
+          <Text style={styles.buttonTitle}>
+            Login
+          </Text>
+          :
+          <ActivityIndicator size={20} color={theme.colors.text}/>
+        }
       </RectButton>
     </KeyboardAvoidingView>
   );
