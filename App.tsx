@@ -1,5 +1,5 @@
+import React, { useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import React from 'react';
 import { theme } from './src/global/theme';
 import { Routes } from './src/routes';
 import { Roboto_400Regular, Roboto_700Bold } from '@expo-google-fonts/roboto';
@@ -9,6 +9,8 @@ import AppLoading from 'expo-app-loading';
 import { Background } from './src/components/Background';
 import { MenuContextProvider } from './src/context/MenuContext';
 import { OrdersContextProvider } from './src/context/OrderContext';
+import * as Updates from 'expo-updates';
+import { Alert } from 'react-native';
 
 export default function App() {
   let [ isFontsReady ] = useFonts({
@@ -17,7 +19,40 @@ export default function App() {
     Ubuntu_400Regular,
     Ubuntu_500Medium
   })
-
+  
+  const showAlert = () => {
+    Alert.alert(
+      "NOVA ATUALIZAÇÃO DISPONÍVEL",
+      "É necessário reiniciar o aplicativo",
+      [
+        {
+          text: "Atualizar",
+          onPress: () => Updates.reloadAsync(),
+          style: "default",
+        },
+      ],
+      {
+        cancelable: false,
+      }
+    );
+  }
+      
+useEffect(()=>{
+  if(__DEV__) return console.log('Updates ignorado por estar em desenvolvimento.');
+  async function handleUpdate() {
+    try {
+      const { isAvailable } = await Updates.checkForUpdateAsync();
+      if (isAvailable) {
+        await Updates.fetchUpdateAsync();
+        showAlert();
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  }
+  handleUpdate();
+}, [])
+  
   if(!isFontsReady){
     return(
       <AppLoading />

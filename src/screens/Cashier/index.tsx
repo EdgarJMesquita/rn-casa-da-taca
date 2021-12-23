@@ -66,7 +66,6 @@ export function Cashier(){
 
   useEffect(()=>{
     if(format(date,'dd/MM/yyyy')===format(new Date(),'dd/MM/yyyy')) return;
-
     async function handleFetchReport() {
       const year = date.getFullYear();
       const month = date.getMonth()+1;
@@ -76,6 +75,7 @@ export function Cashier(){
 
       if(history){
         setOrders(history);
+        console.log('history');
       }
     }
     handleFetchReport();
