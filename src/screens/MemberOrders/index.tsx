@@ -17,6 +17,7 @@ export function MemberOrders({ route, navigation }:MemberOrdersProps){
   const { tables, deleteOrder, addOrder, updateOrder } = useOrders();
   const [ isMenuVisible, setMenuVisible ] = useState(false);
   const selectedMember = tables?.find(table=>table.id===tableId)?.members?.find(member=>member.id===memberId);
+  const { user } = useOrders();
 
   const uid:string = 'WlbQiG4RCSeKrNkqSpMvhZWlByE2';
 
@@ -89,7 +90,7 @@ export function MemberOrders({ route, navigation }:MemberOrdersProps){
                   key={index}
                   //deleteOrder={()=>handleDeleteOrder(item.id)}
                   actionName={
-                    user.uid===uid && item.status!=='paid'?
+                    user?.uid===uid && item.status!=='paid'?
                     'Pagar'
                     :''
                   }
