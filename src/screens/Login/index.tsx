@@ -28,7 +28,6 @@ export function Login(){
     try {
       setLoading(true);
       const { user } = await signInWithEmailAndPassword(auth, email, password);
-      console.log(user);
       if(!user) return;
 
       const _user = {

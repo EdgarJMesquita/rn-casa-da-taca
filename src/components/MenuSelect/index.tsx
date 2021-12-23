@@ -27,7 +27,7 @@ export function MenuSelect({isVisible, closeModal, addSelectedItem}:ModalSelectP
     >
       <Pressable style={styles.container}>
         <View style={styles.topBar}></View>
-        <ScrollView style={{width: '80%'}}>
+        <ScrollView style={{flex: 1 ,width: '80%'}}>
           {
             menu?.map((item, index)=>(
               <MenuCard 

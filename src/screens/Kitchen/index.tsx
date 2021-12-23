@@ -16,7 +16,7 @@ export function Kitchen({ route, navigation }:StackScreensProps){
   const { user, tables, updateOrder } = useOrders();
   const [ newOrders, setNewOrders ] = useState<NewOrdersProps[]>();
 
-  const uid = '4s2VROZeAdd5HlJFj18imS4i7hh2';
+  const uid = 'WlbQiG4RCSeKrNkqSpMvhZWlByE2';
 
   function handleFinishOrder(tableId: string, memberId: string, orderId: string){
     updateOrder(tableId, memberId, orderId, 'done');
