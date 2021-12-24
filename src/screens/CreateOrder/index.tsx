@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, TextInput } from 'react-native';
 import { theme } from '../../global/theme';
 import { FontAwesome, FontAwesome5, Fontisto } from '@expo/vector-icons'; 
@@ -18,8 +18,9 @@ export function CreateOrder({route, navigation}:CreateOrderProps){
   const [ observation, setObservation ] = useState('');
   const [ showFirstFlavorSelect, setShowFirstFlavorSelect ] = useState(false);
   const [ showSecondFlavorSelect, setShowSecondFlavorSelect ] = useState(false);
-  const { flavors } = useMenu();
+  const { getFlavours } = useMenu();
   const { addOrder } = useOrders();
+  const [ flavours, setFlavours ] = useState<string[]>();
 
   async function handleAddOrder() {
     if(!firstFlavor || !selectedMenuItem?.name) return;
@@ -45,6 +46,13 @@ export function CreateOrder({route, navigation}:CreateOrderProps){
       console.log(error);
     }
   }
+  
+  useEffect(()=>{
+    (async()=>{
+      const _menu = await getFlavours();
+      setFlavours(_menu);
+    })();
+  },[]);
 
   return (
     <Background>
@@ -141,14 +149,14 @@ export function CreateOrder({route, navigation}:CreateOrderProps){
         <FlavorSelect 
           isVisible={showFirstFlavorSelect}
           closeModal={()=>setShowFirstFlavorSelect(false)}
-          data={flavors}
+          data={flavours}
           setFlavor={setFirstFlavor}
           />
 
         <FlavorSelect 
           isVisible={showSecondFlavorSelect}
           closeModal={()=>setShowSecondFlavorSelect(false)}
-          data={flavors}
+          data={flavours}
           setFlavor={setSecondFlavor}
           />
       </View>

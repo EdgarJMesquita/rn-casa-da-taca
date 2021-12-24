@@ -6,7 +6,7 @@ export const styles = StyleSheet.create({
     flex: 1,
     width: '100%',
     backgroundColor: theme.colors.black80,
-    marginTop: 50,
+    marginTop: 100,
     alignItems: 'center',
     borderTopRightRadius: 15,
     borderTopLeftRadius: 15

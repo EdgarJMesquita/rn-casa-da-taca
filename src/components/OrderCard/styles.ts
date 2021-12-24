@@ -33,8 +33,9 @@ export const styles = StyleSheet.create({
 
   form: {
     flex: 1, 
-    paddingTop: 5,
-    paddingRight: 20,
+    width: '100%',
+    paddingTop: 15,
+    paddingHorizontal: 20,
     paddingBottom: 20
   },
 

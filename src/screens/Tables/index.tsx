@@ -17,6 +17,8 @@ export function Tables({navigation}:StackScreensProps){
 
   const filteredTables = tables?.filter(item=>item.attendant===user?.uid);
 
+  const isAdmin = user?.uid==='WlbQiG4RCSeKrNkqSpMvhZWlByE2' || user?.uid==='4s2VROZeAdd5HlJFj18imS4i7hh2';
+
   async function handleCreateTable() {
     if(!newTableName) return;
     if(tables?.map(item=>item.name).includes(newTableName)) return;
@@ -39,7 +41,7 @@ export function Tables({navigation}:StackScreensProps){
         <ScrollView style={{flex: 1, width: '100%'}}>
           { filteredTables?
             filteredTables.length>0?
-            filteredTables.filter(item=>item.attendant===user?.uid)
+            filteredTables.filter(item=>item.attendant===user?.uid || isAdmin)
             .map((table,index)=>(
               <TableCard 
                 table={table}

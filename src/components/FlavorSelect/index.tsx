@@ -7,13 +7,11 @@ import { styles } from './styles';
 type ModalSelectProps = {
   isVisible: boolean;
   closeModal: ()=>void;
-  data: string[]|null;
+  data: string[]|undefined;
   setFlavor: (value:string)=>void;
 }
 
 export function FlavorSelect({isVisible, closeModal, data, setFlavor}:ModalSelectProps){
-  
-
   function handleSelectFlavor(flavor:string){
     setFlavor(flavor);
     closeModal();

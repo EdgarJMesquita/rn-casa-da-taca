@@ -16,7 +16,7 @@ export function Kitchen({ route, navigation }:StackScreensProps){
   const { user, tables, updateOrder } = useOrders();
   const [ newOrders, setNewOrders ] = useState<NewOrdersProps[]>();
 
-  const uid = 'WlbQiG4RCSeKrNkqSpMvhZWlByE2';
+  const isAdmin =  user?.uid==='WlbQiG4RCSeKrNkqSpMvhZWlByE2' || user?.uid==='4s2VROZeAdd5HlJFj18imS4i7hh2';
 
   function handleFinishOrder(tableId: string, memberId: string, orderId: string){
     updateOrder(tableId, memberId, orderId, 'done');
@@ -65,7 +65,7 @@ export function Kitchen({ route, navigation }:StackScreensProps){
                       </Text>
                       <OrderCard
                         order={order}
-                        actionName={user?.uid===uid? 'Finalizar':''}
+                        isAdmin={isAdmin}
                         action={()=>handleFinishOrder(table.id, member.id, order.id)}
                       />
                     </View>

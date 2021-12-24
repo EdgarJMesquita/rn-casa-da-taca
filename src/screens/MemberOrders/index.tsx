@@ -19,7 +19,7 @@ export function MemberOrders({ route, navigation }:MemberOrdersProps){
   const selectedMember = tables?.find(table=>table.id===tableId)?.members?.find(member=>member.id===memberId);
   const { user } = useOrders();
 
-  const uid:string = 'WlbQiG4RCSeKrNkqSpMvhZWlByE2';
+  const isAdmin = user?.uid==='WlbQiG4RCSeKrNkqSpMvhZWlByE2' || user?.uid==='4s2VROZeAdd5HlJFj18imS4i7hh2';
 
   const noPaidOrders = selectedMember?.orders?.length? 
     selectedMember.orders.filter(item=>item.status!=='paid')
@@ -89,11 +89,7 @@ export function MemberOrders({ route, navigation }:MemberOrdersProps){
                   order={item}
                   key={index}
                   //deleteOrder={()=>handleDeleteOrder(item.id)}
-                  actionName={
-                    user?.uid===uid && item.status!=='paid'?
-                    'Pagar'
-                    :''
-                  }
+                  isAdmin={isAdmin}
                   action={()=>handlePayment(tableId, memberId, item.id)}
                 />
               ))

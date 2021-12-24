@@ -71,7 +71,7 @@ function DrawerRoutes(){
         component={Cashier}
         options={{
           drawerIcon: (props)=><MaterialIcons name="attach-money" color="#FFFFFF" size={22}/>,
-          title: 'Caixa',
+          title: 'Fechamento',
           ...drawerItemStyles,
           drawerItemStyle: {
             width: 250,

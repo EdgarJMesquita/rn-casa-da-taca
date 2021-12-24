@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Pressable, ScrollView, View } from 'react-native';
 import Modal from 'react-native-modal';
 import { MenuProps } from '../../context/MenuContext';
@@ -13,7 +13,16 @@ type ModalSelectProps = {
 }
 
 export function MenuSelect({isVisible, closeModal, addSelectedItem}:ModalSelectProps){
-  const { menu } = useMenu();
+  const { getMenu } = useMenu();
+  const [ menu, setMenu ] = useState<MenuProps[]>([]);
+  
+  useEffect(()=>{
+    if(!isVisible)return;
+    (async()=>{
+      const _menu = await getMenu();
+      setMenu(_menu);
+    })();
+  },[isVisible]);
 
   return (
     <Modal
