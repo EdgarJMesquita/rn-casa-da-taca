@@ -1,31 +1,34 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, TextInput } from 'react-native';
 import { theme } from '../../global/theme';
-import { FontAwesome, FontAwesome5, Fontisto } from '@expo/vector-icons'; 
+import { FontAwesome, FontAwesome5, Fontisto, AntDesign } from '@expo/vector-icons'; 
 import { styles } from './styles';
 import { FlavorSelect } from '../../components/FlavorSelect';
-import { RectButton } from 'react-native-gesture-handler';
+import { BorderlessButton, RectButton } from 'react-native-gesture-handler';
 import { useMenu } from '../../hooks/useMenu';
 import { Background } from '../../components/Background';
 import { useOrders } from '../../hooks/useOrders';
-import { CreateOrderProps } from '../../routes/types';
+import { EditOrderProps } from '../../routes/types';
+import { MenuProps } from '../../context/MenuContext';
 
-export function CreateOrder({ route, navigation}:CreateOrderProps){
-  const { selectedMenuItem, memberId, tableId } = route.params;
-  const [ size, setSize ] = useState<number>(0);
-  const [ firstFlavor, setFirstFlavor ] = useState('');
-  const [ secondFlavor, setSecondFlavor ] = useState('');
-  const [ observation, setObservation ] = useState('');
+export function EditOrder({ route, navigation}:EditOrderProps){
+  const { order, memberId, tableId } = route.params;
+  const [ firstFlavor, setFirstFlavor ] = useState(order?.firstFlavor?order.firstFlavor:'');
+  const [ secondFlavor, setSecondFlavor ] = useState(order?.secondFlavor? order.secondFlavor:'');
+  const [ observation, setObservation ] = useState(order?.observation? order.observation:'');
   const [ showFirstFlavorSelect, setShowFirstFlavorSelect ] = useState(false);
   const [ showSecondFlavorSelect, setShowSecondFlavorSelect ] = useState(false);
-  const { getFlavours } = useMenu();
-  const { addOrder, editOrder } = useOrders();
+  const { getFlavours, getMenu } = useMenu();
+  const { editOrder, deleteOrder } = useOrders();
   const [ flavours, setFlavours ] = useState<string[]>();
+  const [ selectedMenuItem, setSelectedMenuItem ] = useState<MenuProps>();
+  const [ size, setSize ] = useState<number>([250,330,600].indexOf(order.size));
 
-  async function handleAddOrder() {
+  async function handleEditOrder() {
     if(!firstFlavor || !selectedMenuItem?.name) return;
     
-    const order = {
+    const updatedOrder = {
+      id: order.id,
       name: selectedMenuItem?.name,
       firstFlavor,
       observation,
@@ -34,13 +37,12 @@ export function CreateOrder({ route, navigation}:CreateOrderProps){
         (selectedMenuItem?.sizes[size]===330 || selectedMenuItem?.sizes[size] === 600 || selectedMenuItem?.type==="ship")? 
         secondFlavor:'',
       size: selectedMenuItem?.sizes[size],
-      type: selectedMenuItem.type,
-      status: 'new'
+      type: selectedMenuItem.type
     }
 
     try {
-      const orderRef = await addOrder(tableId, memberId, order);
-      if(!orderRef) return;
+      const orderRef = await editOrder(tableId, memberId, updatedOrder);
+      //if(!orderRef) return;
       navigation.goBack();
 
     } catch (error) {
@@ -50,8 +52,15 @@ export function CreateOrder({ route, navigation}:CreateOrderProps){
 
   useEffect(()=>{
     (async()=>{
-      const _menu = await getFlavours();
-      setFlavours(_menu);
+      const _flavours = await getFlavours();
+      setFlavours(_flavours);
+    })();
+  },[]);
+
+  useEffect(()=>{
+    (async()=>{
+      const _menu = await getMenu();
+      setSelectedMenuItem(_menu.find(item=>item.name===order.name));
     })();
   },[]);
 
@@ -68,6 +77,16 @@ export function CreateOrder({ route, navigation}:CreateOrderProps){
         </View>
 
         <View style={styles.form}>
+          <BorderlessButton
+            onPress={()=>deleteOrder(tableId, memberId, order.id)}
+            style={styles.close}
+          >
+            <AntDesign 
+              name="close"
+              size={20}
+              color={theme.colors.primary}
+            />
+          </BorderlessButton>
           {
             selectedMenuItem?.type==='cup' && <Text style={styles.label}>Tamanho*</Text>
           }
@@ -136,11 +155,11 @@ export function CreateOrder({ route, navigation}:CreateOrderProps){
                 R$ {selectedMenuItem?.prices[size]}
               </Text>
               <RectButton 
-                onPress={handleAddOrder}
+                onPress={handleEditOrder}
                 style={styles.submitButton}
                 >
                 <Text style={styles.submitButtonText}>
-                  Salvar
+                  Atualizar
                 </Text>
               </RectButton>
             </View>

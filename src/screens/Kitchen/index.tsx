@@ -8,8 +8,14 @@ import { StackScreensProps } from '../../routes/types';
 import { OrderProps } from '../../context/OrderContext';
 
 type NewOrdersProps = OrderProps & {
-  table: string;
-  client: string;
+  table: {
+    id: string;
+    name: string;
+  };
+  member: {
+    id: string;
+    name: string;
+  };
 }
 
 export function Kitchen({ route, navigation }:StackScreensProps){
@@ -22,24 +28,30 @@ export function Kitchen({ route, navigation }:StackScreensProps){
     updateOrder(tableId, memberId, orderId, 'done');
   }
 
-  /* useEffect(()=>{
+  useEffect(()=>{
     const _newOrders:NewOrdersProps[] = [];
     
     tables?.forEach(table=>{
       table.members?.forEach(member=>{
         member.orders.forEach(order=>{
-          if(order.status!=='paid' || order.status!=='paid'){
+          if(order.status!=='paid' && order.status!=='done' && order.type!=='drink'){
             _newOrders.push({
               ...order,
-              table: '',
-              client: ''
+              table: {
+                id: table.id,
+                name: table.name
+              },
+              member:{
+                id: member.id,
+                name: member.name
+              }
             });
           }
         })
       })
     });
     setNewOrders(_newOrders);
-  },[]); */
+  },[tables]);
 
   return (
     <Background>
@@ -53,6 +65,36 @@ export function Kitchen({ route, navigation }:StackScreensProps){
         fadingEdgeLength={100}
       >
         {
+          newOrders?.length?
+          newOrders?.map((order, index)=>(
+            <View style={{width: '100%'}} key={index}>
+              <Text style={styles.subtitle}>
+                {`Mesa ${order.table.name} > ${order.member.name}`}
+              </Text>
+              <OrderCard
+                order={order}
+                isAdmin={isAdmin}
+                showAction={order.status==='new' || order.status==='cancelled'}
+                actionName="Finalizar"
+                action={()=>handleFinishOrder(order.table.id, order.member.id, order.id)}
+              />
+            </View>
+          ))
+          : (
+            <View style={{width: '100%', height: 500, justifyContent: 'center'}}>
+              <Text style={styles.noMembersMessage}>
+                Não há pedidos
+              </Text>
+            </View>
+          )
+        }
+      </ScrollView>
+    </Background>
+  );
+}
+
+/* 
+{
           tables?.map((table, index)=>(
             table?.members?.length!==0?
               table?.members?.map((member, index)=>(
@@ -81,7 +123,4 @@ export function Kitchen({ route, navigation }:StackScreensProps){
             )
           ))
         }
-      </ScrollView>
-    </Background>
-  );
-}
+*/

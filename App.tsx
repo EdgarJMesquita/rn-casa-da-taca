@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { theme } from './src/global/theme';
 import { Routes } from './src/routes';
@@ -11,8 +11,20 @@ import { MenuContextProvider } from './src/context/MenuContext';
 import { OrdersContextProvider } from './src/context/OrderContext';
 import * as Updates from 'expo-updates';
 import { Alert } from 'react-native';
+import * as Notifications from 'expo-notifications';
+
+Notifications.getExpoPushTokenAsync({experienceId: '@xongas/casadataca'}).then(res=>console.log(res));
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
 
 export default function App() {
+
   let [ isFontsReady ] = useFonts({
     Roboto_400Regular,
     Roboto_700Bold,
@@ -37,21 +49,22 @@ export default function App() {
     );
   }
       
-useEffect(()=>{
-  if(__DEV__) return console.log('Updates ignorado por estar em desenvolvimento.');
-  async function handleUpdate() {
-    try {
-      const { isAvailable } = await Updates.checkForUpdateAsync();
-      if (isAvailable) {
-        await Updates.fetchUpdateAsync();
-        showAlert();
+  useEffect(()=>{
+    if(__DEV__) return console.log('Updates ignorado por estar em desenvolvimento.');
+    async function handleUpdate() {
+      try {
+        const { isAvailable } = await Updates.checkForUpdateAsync();
+        if (isAvailable) {
+          await Updates.fetchUpdateAsync();
+          showAlert();
+        }
+      } catch (e) {
+        console.log(e);
       }
-    } catch (e) {
-      console.log(e);
     }
-  }
-  handleUpdate();
-}, [])
+    handleUpdate();
+  }, []);
+
   
   if(!isFontsReady){
     return(
@@ -62,10 +75,10 @@ useEffect(()=>{
   return (
     <Background>
       <OrdersContextProvider>
-      <MenuContextProvider>
-        <StatusBar style="light" backgroundColor={theme.colors.black100} translucent/>
-        <Routes />
-      </MenuContextProvider>
+        <MenuContextProvider>
+          <StatusBar style="light" backgroundColor={theme.colors.black100} translucent/>
+          <Routes />
+        </MenuContextProvider>
       </OrdersContextProvider>
     </Background>
   );

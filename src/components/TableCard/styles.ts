@@ -8,6 +8,18 @@ export const styles = StyleSheet.create({
     backgroundColor: theme.colors.black100,
     marginBottom: 10,
     borderRadius: 10,
+    //paddingHorizontal: 20,
+    alignItems: 'center',
+    flexDirection: 'row',
+    overflow: 'hidden'
+  },
+
+  button: {
+    flex: 1,
+    height: 50,
+    backgroundColor: theme.colors.black100,
+    //marginBottom: 10,
+    //borderRadius: 10,
     paddingHorizontal: 20,
     alignItems: 'center',
     flexDirection: 'row'

@@ -32,7 +32,7 @@ function DrawerRoutes(){
         component={Menu}
         options={{
           drawerIcon: (props)=><Entypo name="home" color="#FFFFFF" size={22} />,
-          title: 'Menu',
+          title: 'Cardápio',
           ...drawerItemStyles,
         }}
       />
@@ -58,7 +58,6 @@ function DrawerRoutes(){
           drawerItemStyle: {
             width: 250,
             height: 50,
-            paddingHorizontal: 20,
             borderRadius: 5,
             display: (user?.uid==='4s2VROZeAdd5HlJFj18imS4i7hh2' || user?.uid==='WlbQiG4RCSeKrNkqSpMvhZWlByE2')?'flex':'none'
           }
@@ -71,12 +70,11 @@ function DrawerRoutes(){
         component={Cashier}
         options={{
           drawerIcon: (props)=><MaterialIcons name="attach-money" color="#FFFFFF" size={22}/>,
-          title: 'Fechamento',
+          title: 'Fechar venda',
           ...drawerItemStyles,
           drawerItemStyle: {
             width: 250,
             height: 50,
-            paddingHorizontal: 20,
             borderRadius: 5,
             display: (user?.uid==='4s2VROZeAdd5HlJFj18imS4i7hh2' || user?.uid==='WlbQiG4RCSeKrNkqSpMvhZWlByE2')?'flex':'none'
           }

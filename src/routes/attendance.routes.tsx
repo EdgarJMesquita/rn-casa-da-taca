@@ -5,6 +5,7 @@ import { TableMembers } from '../screens/TableMembers';
 import { MemberOrders } from '../screens/MemberOrders';
 import { Tables } from '../screens/Tables';
 import { CreateOrder } from '../screens/CreateOrder';
+import { EditOrder } from '../screens/EditOrder';
 
 const Stack = createNativeStackNavigator();
 
@@ -27,18 +28,24 @@ export function AttendanceRoutes(){
       <Stack.Screen
         name="TableMembers"
         component={TableMembers}
-        options={{animation: 'slide_from_bottom'}}
+        options={{animation: 'slide_from_right'}}
       />
 
       <Stack.Screen
         name="MemberOrders"
         component={MemberOrders}
-        options={{animation: 'slide_from_bottom'}}
+        options={{animation: 'slide_from_right'}}
       />
 
       <Stack.Screen
         name="CreateOrder"
         component={CreateOrder}
+        options={{animation: 'slide_from_right'}}
+      />
+
+      <Stack.Screen
+        name="EditOrder"
+        component={EditOrder}
         options={{animation: 'slide_from_bottom'}}
       />
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ScrollView, View, Text, ActivityIndicator } from 'react-native';
 import { Background } from '../../components/Background';
 import { styles } from './styles';
@@ -9,26 +9,33 @@ import { Entypo } from '@expo/vector-icons';
 import { TableCard } from '../../components/TableCard';
 import { useOrders } from '../../hooks/useOrders';
 import { StackScreensProps } from '../../routes/types';
+import { TableProps } from '../../context/OrderContext';
 
 export function Tables({navigation}:StackScreensProps){
   const [ isVisible, setVisible ] = useState(false);
   const { user, tables, createTable } = useOrders();
   const [ newTableName, setNewTableName ] = useState('');
+  const [ filteredTables, setFilteredTables ] = useState<TableProps[]>();
   const isAdmin = user?.uid==='WlbQiG4RCSeKrNkqSpMvhZWlByE2' || user?.uid==='4s2VROZeAdd5HlJFj18imS4i7hh2';
-  const filteredTables = tables?.filter(item=>item.attendant===user?.uid || isAdmin);
 
   async function handleCreateTable() {
     if(!newTableName) return;
-    if(tables?.map(item=>item.name).includes(newTableName)) return;
-
+    if(tables?.filter(item=>!item.closed_at).map(item=>item.name).includes(newTableName)) return;
+    
     setVisible(false);
-
+    
     const tableRef = await createTable(newTableName);
-
+    
     if(!tableRef) return;
-
+    
+    setNewTableName('');
     navigation.navigate('TableMembers', { tableId: tableRef });
   }
+  
+  useEffect(()=>{
+    const _filteredTables = tables?.filter(item=>item.attendant===user?.uid || isAdmin).filter(item=>!item.closed_at);
+    setFilteredTables(_filteredTables);
+  },[tables])
 
   return (
     <Background>

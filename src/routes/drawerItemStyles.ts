@@ -11,7 +11,6 @@ export const drawerItemStyles = {
   drawerItemStyle: {
     width: 250,
     height: 50,
-    paddingHorizontal: 20,
     borderRadius: 5
   },
   drawerStyle: {

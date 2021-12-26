@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "699739679072",
+    "firebase_url": "https://casa-da-taca-default-rtdb.firebaseio.com",
+    "project_id": "casa-da-taca",
+    "storage_bucket": "casa-da-taca.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:699739679072:android:3dcc63b2bc62f5ba795605",
+        "android_client_info": {
+          "package_name": "com.edgar.casadataca"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "699739679072-jompn4vt0eq5gn9m7tqkh11hsroclobh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB-FOn5GcUm3l33XJhkTpRBBazH7VOJcgY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "699739679072-jompn4vt0eq5gn9m7tqkh11hsroclobh.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

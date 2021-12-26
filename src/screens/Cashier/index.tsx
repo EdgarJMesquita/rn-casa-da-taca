@@ -3,7 +3,7 @@ import { ActivityIndicator, Platform, ScrollView, Text, TouchableOpacity, View }
 import { RectButton } from 'react-native-gesture-handler';
 import { Background } from '../../components/Background';
 import { ConfirmModal } from '../../components/ConfirmModal';
-import { OrderProps } from '../../context/OrderContext';
+import { OrderProps, TableProps } from '../../context/OrderContext';
 import { theme } from '../../global/theme';
 import { useOrders } from '../../hooks/useOrders';
 import DatePicker from '@react-native-community/datetimepicker';
@@ -11,10 +11,6 @@ import { format } from 'date-fns';
 import { styles } from './styles';
 
 export function Cashier(){
-  //const currentDate = new Date();
-  //const day = currentDate.getDate();
-  //const month = currentDate.getMonth()+1;
-  //const year = currentDate.getFullYear();
   const [ orders, setOrders ] = useState<OrderProps[]>([]);
   const [ members, setMembers ] = useState<string[]>([]);
   const { tables, closeDay, fetchReport } = useOrders();
@@ -30,10 +26,12 @@ export function Cashier(){
   };
 
   async function handleCloseDay() {
+    if(!tables) return;
+
     try {
       setVisible(false);
       setLoading(true);
-      await closeDay(orders);
+      await closeDay(tables);
       setOrders([]);
 
     } catch (error) {
@@ -44,11 +42,11 @@ export function Cashier(){
     }
   }
 
-  useEffect(()=>{    
+  function parseTablesToArray(data: TableProps[]|undefined) {
     const allOrders:OrderProps[] = [];
     const allMembers:string[] = [];
-   
-    tables?.forEach(table=>{
+  
+    data?.forEach(table=>{
       table.members?.forEach(member=>{
         if(member.orders.length!==0){
           allMembers.push(member.name);
@@ -60,9 +58,21 @@ export function Cashier(){
         })
       })
     });
-    setMembers(allMembers)
+
+    return {
+      allOrders: allOrders,
+      allMembers: allMembers      
+    }
+  }
+
+  useEffect(()=>{
+    if(format(date,'dd/MM/yyyy')!==format(new Date(),'dd/MM/yyyy')) return;
+
+    const { allOrders, allMembers } = parseTablesToArray(tables)
     setOrders(allOrders);
-  },[]);
+    setMembers(allMembers);
+
+  },[tables, date]);
 
   useEffect(()=>{
     if(format(date,'dd/MM/yyyy')===format(new Date(),'dd/MM/yyyy')) return;
@@ -73,10 +83,9 @@ export function Cashier(){
 
       const history = await fetchReport(year, month, day);
 
-      if(history){
-        setOrders(history);
-        console.log('history');
-      }
+      const { allOrders, allMembers } = parseTablesToArray(history);
+      setOrders(allOrders);
+      setMembers(allMembers);
     }
     handleFetchReport();
   },[date])
@@ -90,6 +99,8 @@ export function Cashier(){
           is24Hour={true}
           display="default"
           onChange={onChange}
+          maximumDate={new Date()}
+          minimumDate={new Date('2021-12-26')}
         />
       )}
       <View style={styles.container}>
@@ -128,7 +139,7 @@ export function Cashier(){
           </Text>
           {
             [...new Set(orders.filter(item=>item.type==='cup').map(item=>item.name))].map((name, index)=>(
-              <View style={[styles.section, index!==0?styles.line:{} ,{ marginTop: 10 }]} key={index}>
+              <View style={[styles.section,{ marginTop: 10 }]} key={index}>
                 <View style={{flexDirection: 'row'}}>
                   <Text style={styles.subLabel}>
                     {name}:
@@ -268,7 +279,7 @@ export function Cashier(){
           </View>
 
           {
-            format(date,'dd/MM/yyyy')===format(new Date(),'dd/MM/yyyy') &&
+            format(date,'dd/MM/yyyy')===format(new Date(),'dd/MM/yyyy') && !!orders &&
             <RectButton 
               style={styles.button}
               onPress={()=>!isLoading && setVisible(true)}

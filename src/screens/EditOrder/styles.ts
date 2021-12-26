@@ -5,7 +5,8 @@ export const styles = StyleSheet.create({
   container: {
     flex: 1,
     width: '100%',
-    padding: 15
+    padding: 15,
+
   },
 
   title: {
@@ -21,6 +22,12 @@ export const styles = StyleSheet.create({
     backgroundColor: theme.colors.black100,
     borderRadius: 10,
     padding: 20
+  },
+
+  close: {
+    position: 'absolute',
+    right: 10,
+    top: 10
   },
 
   label: {

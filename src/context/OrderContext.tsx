@@ -14,7 +14,7 @@ export type OrderProps = {
   observation: string;
   price: string;
   type: 'cup'|'ship'|'drink';
-  status?: 'done'|'paid';
+  status: 'new'|'done'|'paid'|'cancelled';
 }
 
 export type MemberProps = {
@@ -28,6 +28,7 @@ export type TableProps = {
   attendant: string;
   id: string;
   members?: MemberProps[];
+  closed_at?: string|null;
 }
 
 type OrdersContextProviderProps = {
@@ -44,47 +45,43 @@ type NewOrderProps = {
   type: 'cup'|'ship'|'drink'
 }
 
+type OrderDatabaseProps = {
+  [key:string]: {
+    name: string;
+    attendant: string;
+    closed_at?: string;
+    members?: {
+      [key:string]: {
+        name: string;
+        orders?: {
+          [key:string]: {
+            name: string;
+            size: number;
+            firstFlavor: string;
+            secondFlavor: string;
+            observation: string;
+            price: string;
+            type: 'cup'|'ship'|'drink';
+            status: 'new'|'done'|'paid'|'cancelled';
+          }
+        };
+      }
+    };
+  };
+}
+
 type OrdersContextProps = {
-  user: User|undefined;
+  user: User|null;
   tables: TableProps[]|undefined;
   setUser: (user:User)=>void;
   createTable: (tableName: string)=>Promise<string|null>;
   addMember: (tableId: string, memberName: string)=>Promise<string|null>;
   addOrder: (tableId: string, memberId: string, order: NewOrderProps)=>Promise<string|null>;
-  deleteOrder: (tableId: string, memberId: string, orderId:string)=>void;
   updateOrder: (tableId: string, memberId: string, orderId:string, status: 'done'|'paid')=>Promise<void>;
-  closeDay: (report: OrderProps[])=>Promise<boolean>;
-  fetchReport: (year: number, month: number, day: number)=>Promise<OrderProps[]|null>;
-}
-
-type DatabaseOrderProps = {
-  [key:string]: {
-    name: string;
-    size: number;
-    firstFlavor: string;
-    secondFlavor: string;
-    observation: string;
-    price: string;
-    type: 'cup'|'ship'|'drink';
-    status?: 'done'|'paid';
-  }
-}
-
-type DatabaseMembersProps = {
-  [key:string]: {
-    name: string;
-    orders?: DatabaseOrderProps;
-  }
-}
-
-type DatabaseTableProps = {
-  name: string;
-  attendant: string;
-  members?:  DatabaseMembersProps;
-}
-
-type OrderDatabaseProps = {
-  [key:string]: DatabaseTableProps;
+  closeDay: (report: TableProps[])=>Promise<boolean>;
+  fetchReport: (year: number, month: number, day: number)=>Promise<TableProps[]|[]>;
+  closeTable: (tableId: string)=>Promise<void>;
+  editOrder: (tableId: string, memberId: string, order: OrderProps) => Promise<void>;
 }
 
 Notifications.setNotificationHandler({
@@ -95,15 +92,14 @@ Notifications.setNotificationHandler({
   }),
 });
 
-export const OrdersContext = createContext({}as OrdersContextProps);
+export const OrdersContext = createContext({} as OrdersContextProps);
 
 export function OrdersContextProvider({children}:OrdersContextProviderProps){
   const [ tables, setTables ] = useState<TableProps[]|undefined>();
-  const [ user, setUser ] = useState<User>();
+  const [ user, setUser ] = useState<User|null>(null);
 
   async function createTable(tableName: string) {
     if(!user) return null;
-
     try {
       const tableRef = ref(database, 'tables');
       const response = await push(tableRef, { name: tableName, attendant: user.uid })
@@ -127,20 +123,27 @@ export function OrdersContextProvider({children}:OrdersContextProviderProps){
     }
   }
 
+  async function editOrder(tableId: string, memberId: string, order: OrderProps) {
+    try {
+      const { id, ...rest } = order;
+      const orderRef = ref(database, `tables/${tableId}/members/${memberId}/orders/${id}`);
+      await update(orderRef, {...rest});
+
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   async function addOrder(tableId: string, memberId: string, order: NewOrderProps) {
     try {
       const orderRef = ref(database, `tables/${tableId}/members/${memberId}/orders`);
-      const response = await push(orderRef, order);
-      return response.key;
+      const { key } = await push(orderRef, order);
+      return key;
       
     } catch (error) {
       console.log(error);
       return null;
     }
-  }
-
-  async function deleteOrder(tableId: string, memberId: string, orderId:string) {
-    console.log({tableId, memberId, orderId})
   }
 
   async function updateOrder(tableId: string, memberId: string, orderId:string, status: string) {
@@ -154,19 +157,20 @@ export function OrdersContextProvider({children}:OrdersContextProviderProps){
     }
   }
 
-  async function closeDay(report: OrderProps[]) {
+  async function closeDay(report: TableProps[]) {
     const currentDate = new Date();
     const day = currentDate.getDate();
     const month = currentDate.getMonth()+1;
     const year = currentDate.getFullYear();
     
     try {
+      console.log(report);
       const historyRef = ref(
         database, 
         `history/${year}/${month}/${day}`
       );
       await set(historyRef, report);
-      
+
       const tableRef = ref(database, 'tables');
       await remove(tableRef);
       
@@ -175,8 +179,6 @@ export function OrdersContextProvider({children}:OrdersContextProviderProps){
       console.log(error);
       return false
     }
-
-
   }
 
   async function fetchReport(year: number, month: number, day: number) {
@@ -186,16 +188,28 @@ export function OrdersContextProvider({children}:OrdersContextProviderProps){
         `history/${String(year).padStart(2,'0')}/${String(month).padStart(2,'0')}/${String(day).padStart(2,'0')}`
       );
       const store = await get(historyRef);
-      const history:OrderProps[] = store.val();
+      const history:TableProps[] = store.val();
 
       if(history){
         return history;
       }
-      return null;
+      return [];
 
     } catch (error) {
       console.log(error);
-      return null;
+      return [];
+    }
+  }
+
+  async function closeTable(tableId:string) {
+    try {
+      const tableRef = ref(database, `tables/${tableId}`)
+      update(tableRef, {
+        closed_at: new Date() 
+      });
+      
+    } catch (error) {
+      console.log(error);
     }
   }
 
@@ -214,6 +228,7 @@ export function OrdersContextProvider({children}:OrdersContextProviderProps){
           id: tableKey,
           name: table.name,
           attendant: table.attendant,
+          closed_at: table.closed_at||null,
           members: table.members? 
             Object.entries(table.members)
             .map(([memberKey,member])=>({
@@ -234,50 +249,17 @@ export function OrdersContextProvider({children}:OrdersContextProviderProps){
     }
   },[user]);
 
-  useEffect(()=>{
-    if(!user) return;
-
-    const tablesRef = ref(database, 'tables')
-    onChildAdded(tablesRef,(databaseSnapshot)=>{
-      if(!databaseSnapshot.exists()) return;
-
-      const newOrders:OrderProps[] = [];
-
-      tables?.forEach(table=>{
-        table.members?.forEach(member=>{
-          member.orders?.forEach(order=>{
-            if(!order.status){
-              newOrders.push(order);
-            }
-          })
-        })
-      });
-
-     0 && Notifications.scheduleNotificationAsync({
-        content: {
-          title: `${newOrders?.length} Novos pedidos`,
-          body: `Pedido ${newOrders[0]?.name}.`
-        },
-        trigger: {
-          seconds: 1
-        }
-      })
-    })
-    return()=>{
-      off(tablesRef);
-    }
-  },[user]);
-
   return(
     <OrdersContext.Provider value={{
       user,
       tables,
+      closeTable,
       setUser,
       createTable,
       addMember,
       addOrder,
+      editOrder,
       updateOrder,
-      deleteOrder,
       closeDay,
       fetchReport
     }}>

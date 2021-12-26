@@ -14,7 +14,7 @@ export function CustomDrawer({email, ...props}:CustomDrawerContentCOmponenteProp
     <View style={styles.container}>
       <View style={styles.avatar}>
         <Text style={styles.userInitials}>
-          MI
+          {email? email[0].toUpperCase():''}
         </Text>
       </View>
       <Text style={styles.username}>

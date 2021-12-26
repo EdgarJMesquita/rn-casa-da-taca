@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScrollView, View, Text, ImageBackground } from 'react-native';
+import { ScrollView, View, Text, Image } from 'react-native';
 import { Background } from '../../components/Background';
 import Bogota from '../../assets/bogota.jpg';
 import Helsinki from '../../assets/helsinki.jpg';
@@ -10,11 +10,9 @@ import Nairobi from '../../assets/nairobi.jpeg';
 import Professor from '../../assets/professor.jpeg';
 import Rio from '../../assets/rio.jpeg';
 import Tokyo from '../../assets/tokyo.jpeg';
-import Lisboa from '../../assets/lisboa.png';
+import Lisboa from '../../assets/lisboa.jpeg';
 import Sierra from '../../assets/sierra.jpeg';
-
 import { styles } from './styles';
-
 
 const data = [
   {
@@ -73,27 +71,22 @@ export function Menu(){
   return (
     <Background>
       <View style={styles.container}>
-        <Text style={styles.title}>
+        {/* <Text style={styles.title}>
           Taças
-        </Text>
-        <ScrollView style={{flex: 1, width: '100%'}}>
+        </Text> */}
+        <ScrollView 
+          style={{flex: 1, width: '100%'}}
+          fadingEdgeLength={100}
+          showsVerticalScrollIndicator={false}
+        >
           {
             data.map((item, index)=>(
-              <ImageBackground
+              <Image
                 key={index}
                 source={item.source}
-                style={{height: 400, width: '100%', borderRadius: 5, marginBottom: 20}}
+                style={{ height: 400, width: '100%', borderRadius: 15, marginBottom: 20 }}
                 resizeMode="contain"
-              >
-                {/* <View style={styles.priceContainer}>
-                  <Text style={styles.price}>
-                    {item.size250}
-                  </Text>
-                  <Text style={styles.price}>
-                    {item.size330}
-                  </Text>
-                </View> */}
-              </ImageBackground>
+              />
             ))
           }
         </ScrollView>

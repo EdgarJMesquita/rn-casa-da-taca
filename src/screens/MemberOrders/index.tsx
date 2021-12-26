@@ -88,7 +88,11 @@ export function MemberOrders({ route, navigation }:MemberOrdersProps){
                 <OrderCard
                   order={item}
                   key={index}
-                  //deleteOrder={()=>handleDeleteOrder(item.id)}
+                  editOrder={()=>navigation.navigate('EditOrder', { 
+                    tableId, memberId, order: item
+                  })}
+                  actionName="Pagar"
+                  showAction={item.status==='done'}
                   isAdmin={isAdmin}
                   action={()=>handlePayment(tableId, memberId, item.id)}
                 />

@@ -1,6 +1,7 @@
 import React from 'react';
-import { Pressable, ScrollView, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
 import Modal from 'react-native-modal';
+import { theme } from '../../global/theme';
 import { FlavorCard } from '../FlavorCard';
 import { styles } from './styles';
 
@@ -36,13 +37,19 @@ export function FlavorSelect({isVisible, closeModal, data, setFlavor}:ModalSelec
         <View style={styles.topBar}></View>
         <ScrollView style={{width: '80%'}}>
           {
-            data?.map((flavor, index)=>(
-              <FlavorCard 
-                flavor={flavor}
-                action={()=>handleSelectFlavor(flavor)}
-                key={index}
-              />
-            ))
+            data? (
+              data?.map((flavor, index)=>(
+                <FlavorCard 
+                  flavor={flavor}
+                  action={()=>handleSelectFlavor(flavor)}
+                  key={index}
+                />
+              ))
+            ) : (
+              <View style={{height: 500, width: '100%', justifyContent: 'center', alignItems: 'center'}}>
+                <ActivityIndicator size={30} color={theme.colors.primary} />
+              </View>
+            )
           }
         </ScrollView>
       </Pressable>
