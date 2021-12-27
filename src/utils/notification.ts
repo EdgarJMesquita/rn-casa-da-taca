@@ -1,33 +1,95 @@
 import * as Notifications from 'expo-notifications';
+import { set, ref, get } from 'firebase/database';
 import { Platform } from 'react-native';
+import { database } from '../service/database';
 
-/* export async function sendNotification() {
-  const token = await registerForPushNotificationsAsync();
-  const url = 'https://exp.host/--/api/v2/push/send';
-  const headers = {
-    "host": "exp.host",
-    "accept": "application/json",
-    "accept-encoding": "gzip, deflate",
-    "content-type": "application/json"
-  }
-  const body = {
-    to: token,
-    title: 'hello',
-    body: 'world'
-  }
+type SendNotificationParams = {
+  title: string;
+  body: string;
+}
 
+type KeyProps = {
+  [key:string]: {
+    role: 'admin'|'attendant';
+    token: string;
+  }
+}
+
+export async function fetchKeys(role: 'admin'|'attendant') {
   try {
-    const response = await fetch(url,{
-      method: 'POST',
-      headers,
-      body: JSON.stringify(body)
-    });
-    console.log(response);
+    const keyRef = ref(database, 'notification');
+    const res = await get(keyRef);
+    const data:KeyProps|undefined = res.val();
+    if(!data) return;
+
+    const key = Object.values(data).filter(item=>item.role===role).map(item=>item.token);    
     
+    return key;
+
   } catch (error) {
     console.log(error);
   }
-} */
+}
+
+export async function sendNotificationToKitchen(message:SendNotificationParams) {
+  const url = 'https://exp.host/--/api/v2/push/send';
+  try {
+    const keys = await fetchKeys('admin');
+    if(!keys) return console.log('error em recuperar key de admin');
+
+    keys.forEach(async(item)=>{
+      const response = await fetch(url,{
+        method: 'POST',
+        headers: {
+          "host": "exp.host",
+          "accept": "application/json",
+          "accept-encoding": "gzip, deflate",
+          "content-type": "application/json"
+        },
+        body: JSON.stringify({
+          ...message,
+          to: item
+        })
+      });
+  
+      const data = await response.json();
+      console.log('notificação enviada');
+    });
+
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export async function sendNotificationToAttendant(message:SendNotificationParams) {
+  const url = 'https://exp.host/--/api/v2/push/send';
+  try {
+    const keys = await fetchKeys('attendant');
+    if(!keys) return console.log('error em recuperar key de admin');
+
+    keys.forEach(async(item)=>{
+      const response = await fetch(url,{
+        method: 'POST',
+        headers: {
+          "host": "exp.host",
+          "accept": "application/json",
+          "accept-encoding": "gzip, deflate",
+          "content-type": "application/json"
+        },
+        body: JSON.stringify({
+          ...message,
+          to: item
+        })
+      });
+  
+      const data = await response.json();
+      console.log('notificação enviada');
+    });
+
+  } catch (error) {
+    console.log(error);
+  }
+}
 
 export async function registerForPushNotificationsAsync() {
   let token;
@@ -56,4 +118,22 @@ export async function registerForPushNotificationsAsync() {
   }
 
   return token;
+}
+
+export async function updateMobileKey(token: string, role: 'admin'|'attendant', uid: string) {
+  try {
+    const keyRef = ref(database, `notification/${uid}`)
+    await set(keyRef, {
+      token,
+      role
+    });
+    console.log({token, role});
+
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export async function name() {
+  
 }

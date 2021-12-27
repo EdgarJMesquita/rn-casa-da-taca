@@ -4,6 +4,8 @@ import { onValue, ref, off, push, update, set, remove, onChildAdded, get } from 
 import { database } from "../service/database";
 import * as Notifications from 'expo-notifications';
 import { User } from '../screens/Login';
+import { registerForPushNotificationsAsync, sendNotificationToAttendant, sendNotificationToKitchen, updateMobileKey } from '../utils/notification';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export type OrderProps = {
   id: string;
@@ -77,7 +79,7 @@ type OrdersContextProps = {
   createTable: (tableName: string)=>Promise<string|null>;
   addMember: (tableId: string, memberName: string)=>Promise<string|null>;
   addOrder: (tableId: string, memberId: string, order: NewOrderProps)=>Promise<string|null>;
-  updateOrder: (tableId: string, memberId: string, orderId:string, status: 'done'|'paid')=>Promise<void>;
+  updateOrder: (tableId: string, memberId: string, orderId:string, status: 'done'|'paid'|'cancelled')=>Promise<void>;
   closeDay: (report: TableProps[])=>Promise<boolean>;
   fetchReport: (year: number, month: number, day: number)=>Promise<TableProps[]|[]>;
   closeTable: (tableId: string)=>Promise<void>;
@@ -129,6 +131,13 @@ export function OrdersContextProvider({children}:OrdersContextProviderProps){
       const orderRef = ref(database, `tables/${tableId}/members/${memberId}/orders/${id}`);
       await update(orderRef, {...rest});
 
+      const table = tables?.find(item=>item.id===tableId)?.name; 
+      const member = tables?.find(item=>item.id===tableId)?.members?.find(item=>item.id===memberId)?.name;
+      sendNotificationToKitchen({
+        title: 'Pedido atualizado',
+        body: `Uma ${order.type==='cup'?'Taça':'Barca'} ${order.name} Sabor ${order.firstFlavor} ${order.secondFlavor? 'e '+order.secondFlavor:''} ${order.size} ml \nMesa: ${table}\nCliente: ${member}`
+      });
+
     } catch (error) {
       console.log(error);
     }
@@ -138,6 +147,15 @@ export function OrdersContextProvider({children}:OrdersContextProviderProps){
     try {
       const orderRef = ref(database, `tables/${tableId}/members/${memberId}/orders`);
       const { key } = await push(orderRef, order);
+
+      const table = tables?.find(item=>item.id===tableId)?.name; 
+      const member = tables?.find(item=>item.id===tableId)?.members?.find(item=>item.id===memberId)?.name;
+
+      order.type!=='drink' && sendNotificationToKitchen({
+        title: 'Novo pedido',
+        body: `Uma ${order.type==='cup'?'Taça':'Barca'} ${order.name} Sabor ${order.firstFlavor} ${order.secondFlavor? 'e '+order.secondFlavor:''} ${order.size} ml \nMesa: ${table} \nCliente: ${member}`
+      });
+
       return key;
       
     } catch (error) {
@@ -151,6 +169,12 @@ export function OrdersContextProvider({children}:OrdersContextProviderProps){
       const orderRef = ref(database, `tables/${tableId}/members/${memberId}/orders/${orderId}`);
       await update(orderRef, { status });
       console.log('Atualizado com sucesso para '+status);
+
+      const order = tables?.find(item=>item.id===tableId)?.members?.find(item=>item.id===memberId)?.orders.find(item=>item.id===orderId);
+      status==='done' && sendNotificationToAttendant({
+        title: 'Pedido Pronto',
+        body: `Mesa ${tables?.find(item=>item.id===tableId)?.name} \n Cliente ${tables?.find(item=>item.id===tableId)?.members?.find(item=>item.id===memberId)?.name} \n Pedido ${order?.type==='cup'?'Taça':'Barca'} ${order?.name} Sabor ${order?.firstFlavor} ${order?.secondFlavor? 'e '+order.secondFlavor:''} ${order?.size} ml`
+      });
 
     } catch (error) {
       console.log(error);
@@ -249,6 +273,42 @@ export function OrdersContextProvider({children}:OrdersContextProviderProps){
     }
   },[user]);
 
+  useEffect(()=>{
+    if(!user) return;
+    const subscription = Notifications.addPushTokenListener(({data})=>{
+      const role = user?.uid==='WlbQiG4RCSeKrNkqSpMvhZWlByE2' || user?.uid==='4s2VROZeAdd5HlJFj18imS4i7hh2'? 'admin':'attendant';
+      if(!user.uid) return;
+      updateMobileKey(data, role, user.uid);
+    });
+    return()=>{
+      subscription.remove();
+    }
+  },[user]);
+
+  useEffect(()=>{
+    if(!user) return;
+    (async()=>{
+      try {
+        const store = await AsyncStorage.getItem('@token');
+        if(store) return console.log('Token em async storage: '+store);
+
+        const token = await registerForPushNotificationsAsync();
+        if(!token) return console.log('Missing token');
+
+        const role = user?.uid==='WlbQiG4RCSeKrNkqSpMvhZWlByE2' || user?.uid==='4s2VROZeAdd5HlJFj18imS4i7hh2'? 'admin':'attendant';
+        
+        if(!user.uid) return;
+        
+        await updateMobileKey(token, role, user.uid);
+
+        await AsyncStorage.setItem('@token',token);
+
+      } catch (error) {
+        console.log(error);
+      }
+    })();
+  },[user]);
+  //AsyncStorage.removeItem('@token');
   return(
     <OrdersContext.Provider value={{
       user,

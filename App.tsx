@@ -13,12 +13,10 @@ import * as Updates from 'expo-updates';
 import { Alert } from 'react-native';
 import * as Notifications from 'expo-notifications';
 
-Notifications.getExpoPushTokenAsync({experienceId: '@xongas/casadataca'}).then(res=>console.log(res));
-
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
-    shouldPlaySound: false,
+    shouldPlaySound: true,
     shouldSetBadge: false,
   }),
 });

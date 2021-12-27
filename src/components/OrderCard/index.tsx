@@ -16,7 +16,7 @@ type CardProps = {
 }
 
 export function OrderCard({ order, showAction, action, actionName, isAdmin, editOrder }:CardProps){
-  
+
   if(order.type==='drink'){
     return(
       <View style={styles.drinkCard}>
@@ -86,6 +86,13 @@ export function OrderCard({ order, showAction, action, actionName, isAdmin, edit
             style={{marginLeft: 5, marginTop: 7}} 
             color={order.status==='paid'? 'green':theme.colors.primary}
           />
+          {
+            order.status==='cancelled' && (
+              <Text style={styles.cancelled}>
+                Cancelado
+              </Text>
+            )
+          }
         </View>
 
         <View style={styles.form}>

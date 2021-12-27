@@ -19,7 +19,7 @@ export function CreateOrder({ route, navigation}:CreateOrderProps){
   const [ showFirstFlavorSelect, setShowFirstFlavorSelect ] = useState(false);
   const [ showSecondFlavorSelect, setShowSecondFlavorSelect ] = useState(false);
   const { getFlavours } = useMenu();
-  const { addOrder, editOrder } = useOrders();
+  const { addOrder } = useOrders();
   const [ flavours, setFlavours ] = useState<string[]>();
 
   async function handleAddOrder() {
@@ -41,6 +41,7 @@ export function CreateOrder({ route, navigation}:CreateOrderProps){
     try {
       const orderRef = await addOrder(tableId, memberId, order);
       if(!orderRef) return;
+      
       navigation.goBack();
 
     } catch (error) {

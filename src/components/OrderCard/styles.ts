@@ -31,6 +31,14 @@ export const styles = StyleSheet.create({
     marginLeft: 15
   },
 
+  cancelled: {
+    fontFamily: theme.fonts.Roboto_400,
+    color: 'red',
+    fontSize: 14,
+    paddingTop: 5,
+    marginLeft: 10
+  },
+
   form: {
     flex: 1, 
     width: '100%',

@@ -19,7 +19,7 @@ export function EditOrder({ route, navigation}:EditOrderProps){
   const [ showFirstFlavorSelect, setShowFirstFlavorSelect ] = useState(false);
   const [ showSecondFlavorSelect, setShowSecondFlavorSelect ] = useState(false);
   const { getFlavours, getMenu } = useMenu();
-  const { editOrder, deleteOrder } = useOrders();
+  const { editOrder, updateOrder } = useOrders();
   const [ flavours, setFlavours ] = useState<string[]>();
   const [ selectedMenuItem, setSelectedMenuItem ] = useState<MenuProps>();
   const [ size, setSize ] = useState<number>([250,330,600].indexOf(order.size));
@@ -37,12 +37,14 @@ export function EditOrder({ route, navigation}:EditOrderProps){
         (selectedMenuItem?.sizes[size]===330 || selectedMenuItem?.sizes[size] === 600 || selectedMenuItem?.type==="ship")? 
         secondFlavor:'',
       size: selectedMenuItem?.sizes[size],
-      type: selectedMenuItem.type
+      type: selectedMenuItem.type,
+      status: order.status
     }
 
     try {
-      const orderRef = await editOrder(tableId, memberId, updatedOrder);
+      await editOrder(tableId, memberId, updatedOrder);
       //if(!orderRef) return;
+     
       navigation.goBack();
 
     } catch (error) {
@@ -78,7 +80,7 @@ export function EditOrder({ route, navigation}:EditOrderProps){
 
         <View style={styles.form}>
           <BorderlessButton
-            onPress={()=>deleteOrder(tableId, memberId, order.id)}
+            onPress={()=>updateOrder(tableId, memberId, order.id, 'cancelled')}
             style={styles.close}
           >
             <AntDesign 
