@@ -52,6 +52,11 @@ export function EditOrder({ route, navigation}:EditOrderProps){
     }
   }
 
+  async function handleCancelOrder() {
+    await updateOrder(tableId, memberId, order.id, 'cancelled');
+    navigation.goBack();
+  }
+
   useEffect(()=>{
     (async()=>{
       const _flavours = await getFlavours();
@@ -80,7 +85,7 @@ export function EditOrder({ route, navigation}:EditOrderProps){
 
         <View style={styles.form}>
           <BorderlessButton
-            onPress={()=>updateOrder(tableId, memberId, order.id, 'cancelled')}
+            onPress={handleCancelOrder}
             style={styles.close}
           >
             <AntDesign 

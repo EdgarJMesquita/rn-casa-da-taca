@@ -289,19 +289,18 @@ export function OrdersContextProvider({children}:OrdersContextProviderProps){
     if(!user) return;
     (async()=>{
       try {
-        const store = await AsyncStorage.getItem('@token');
-        if(store) return console.log('Token em async storage: '+store);
+        //const store = await AsyncStorage.getItem('@token');
+        //if(store) return console.log('Token em async storage: '+store);
 
         const token = await registerForPushNotificationsAsync();
         if(!token) return console.log('Missing token');
 
         const role = user?.uid==='WlbQiG4RCSeKrNkqSpMvhZWlByE2' || user?.uid==='4s2VROZeAdd5HlJFj18imS4i7hh2'? 'admin':'attendant';
         
-        if(!user.uid) return;
-        
-        await updateMobileKey(token, role, user.uid);
-
-        await AsyncStorage.setItem('@token',token);
+        if(user.uid){
+          await updateMobileKey(token, role, user.uid);
+        }
+        //await AsyncStorage.setItem('@token',token);
 
       } catch (error) {
         console.log(error);
