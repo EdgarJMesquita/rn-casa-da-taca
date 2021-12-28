@@ -31,7 +31,8 @@ export const styles = StyleSheet.create({
   },
 
   button: {
-    width: '50%',
+    flex: 1,
+    //width: '50%',
     height: 40,
     borderWidth: 1,
     borderRadius: 5,
