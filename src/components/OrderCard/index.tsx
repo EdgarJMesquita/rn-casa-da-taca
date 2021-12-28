@@ -4,7 +4,8 @@ import { theme } from '../../global/theme';
 import { styles } from './styles';
 import { OrderProps } from '../../context/OrderContext';
 import { BorderlessButton, RectButton } from 'react-native-gesture-handler';
-import { MaterialIcons, Feather } from '@expo/vector-icons';
+import { MaterialIcons, Feather, AntDesign } from '@expo/vector-icons';
+import { useOrders } from '../../hooks/useOrders';
 
 type CardProps = {
   order: OrderProps;
@@ -16,6 +17,7 @@ type CardProps = {
 }
 
 export function OrderCard({ order, showAction, action, actionName, isAdmin, editOrder }:CardProps){
+  const { deleteOrder } = useOrders();
 
   if(order.type==='drink'){
     return(
@@ -65,7 +67,7 @@ export function OrderCard({ order, showAction, action, actionName, isAdmin, edit
   return (
     <View style={styles.container}>
       {
-        order.status!=='paid' && !!editOrder && (
+        order.status!=='paid' && !!editOrder && order.status!=='cancelled' && (
           <BorderlessButton 
             onPress={editOrder}
             style={styles.close}
@@ -74,6 +76,20 @@ export function OrderCard({ order, showAction, action, actionName, isAdmin, edit
           </BorderlessButton>
         )
       }
+      {/* {
+        order.status==='cancelled' && (
+          <BorderlessButton
+            //onPress={handleCancelOrder}
+            style={styles.close}
+          >
+            <AntDesign 
+              name="close"
+              size={20}
+              color={theme.colors.primary}
+            />
+          </BorderlessButton>
+        )
+      } */}
       <View style={styles.leftBar}></View>
 
       <View style={{flex: 1, width: '100%'}}>
@@ -153,6 +169,18 @@ export function OrderCard({ order, showAction, action, actionName, isAdmin, edit
                   >
                     <Text style={styles.submitButtonText}>
                       {actionName}
+                    </Text>
+                  </RectButton>
+                )
+              }
+              {
+                isAdmin && order.status==='cancelled' && (
+                  <RectButton 
+                    onPress={()=>deleteOrder(order.id)}
+                    style={[styles.submitButton, { marginLeft: 10 }]}
+                  >
+                    <Text style={styles.submitButtonText}>
+                      Excluir
                     </Text>
                   </RectButton>
                 )

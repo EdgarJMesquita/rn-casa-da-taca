@@ -80,6 +80,40 @@ export function Menu(){
           showsVerticalScrollIndicator={false}
         >
           {
+            <View style={{height: 400, width: '100%', marginTop: 30}}>
+              <Text style={styles.title}>
+                Lisboa
+              </Text>
+              <Text style={styles.subtitle}>
+                - Cobertura de brigadeiro branco.
+              </Text>
+              <Text style={styles.subtitle}>
+                - Kitkat
+              </Text>
+              <Text style={styles.subtitle}>
+                - Morango
+              </Text>
+              <Text style={styles.subtitle}>
+                - Kiwi
+              </Text>
+              <Text style={styles.subtitle}>
+                - Bolinhas de chocolate
+              </Text>
+              <Text style={styles.subtitle}>
+                - Chocolate ao redor da taça
+              </Text>
+              <Text style={styles.subtitle}>
+                - Chantininho
+              </Text>
+              <Text style={styles.subtitle}>
+                - Castanhas
+              </Text>
+              <Text style={styles.subtitle}>
+                - Sonho de valsa
+              </Text>
+            </View>
+          }
+          {
             data.map((item, index)=>(
               <Image
                 key={index}

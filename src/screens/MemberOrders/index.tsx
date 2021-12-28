@@ -14,7 +14,7 @@ import { BorderlessButton } from 'react-native-gesture-handler';
 
 export function MemberOrders({ route, navigation }:MemberOrdersProps){
   const { tableId, memberId } = route.params;
-  const { tables, deleteOrder, addOrder, updateOrder } = useOrders();
+  const { tables, addOrder, updateOrder } = useOrders();
   const [ isMenuVisible, setMenuVisible ] = useState(false);
   const selectedMember = tables?.find(table=>table.id===tableId)?.members?.find(member=>member.id===memberId);
   const { user } = useOrders();
@@ -43,10 +43,6 @@ export function MemberOrders({ route, navigation }:MemberOrdersProps){
       return;
     }
     navigation.navigate('CreateOrder',{ selectedMenuItem: selectedMenuItem, memberId, tableId });
-  }
-
-  async function handleDeleteOrder(orderId:string) {
-    deleteOrder(tableId, memberId, orderId)
   }
 
   async function handlePayment(tableId:string, memberId: string, orderId: string){

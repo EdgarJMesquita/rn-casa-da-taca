@@ -16,6 +16,13 @@ export const styles = StyleSheet.create({
     marginBottom: 20
   },
 
+  subtitle: {
+    fontFamily: theme.fonts.Roboto_700,
+    fontSize: 15,
+    color: theme.colors.text,
+    marginBottom: 20
+  },
+
   priceContainer: {
     position: 'absolute',
     bottom: 9,

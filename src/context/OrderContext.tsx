@@ -1,6 +1,6 @@
 import React from 'react';
 import { createContext, ReactNode, useEffect, useState } from "react";
-import { onValue, ref, off, push, update, set, remove, onChildAdded, get } from "firebase/database";
+import { onValue, ref, off, push, update, set, remove, onChildAdded, get,  } from "firebase/database";
 import { database } from "../service/database";
 import * as Notifications from 'expo-notifications';
 import { User } from '../screens/Login';
@@ -85,6 +85,7 @@ type OrdersContextProps = {
   fetchReport: (year: number, month: number, day: number)=>Promise<TableProps[]|[]>;
   closeTable: (tableId: string)=>Promise<void>;
   editOrder: (tableId: string, memberId: string, order: OrderProps) => Promise<void>;
+  deleteOrder: (orderId: string)=>void;
 }
 
 Notifications.setNotificationHandler({
@@ -238,6 +239,31 @@ export function OrdersContextProvider({children}:OrdersContextProviderProps){
     }
   }
 
+  async function deleteOrder(orderId: string) {
+    let tableId = '';
+    let memberId = '';
+
+    tables?.forEach(table=>{
+      table.members?.forEach(member=>{
+        member.orders?.forEach(order=>{
+          if(order.id===orderId){
+            tableId = table.id;
+            memberId = member.id;
+          }
+        })
+      })
+    })
+    
+    try {
+      const orderRef = ref(database, `tables/${tableId}/members/${memberId}/orders/${orderId}`);
+      //console.log(`tables/${tableId}/members/${memberId}/orders${orderId}`);
+      await remove(orderRef);
+
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   useEffect(()=>{
     if(!user) return;
     const tableRef = ref(database, 'tables');
@@ -335,7 +361,8 @@ export function OrdersContextProvider({children}:OrdersContextProviderProps){
       editOrder,
       updateOrder,
       closeDay,
-      fetchReport
+      fetchReport,
+      deleteOrder
     }}>
       {children}
     </OrdersContext.Provider>

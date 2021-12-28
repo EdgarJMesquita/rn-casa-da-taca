@@ -27,7 +27,7 @@ export function TableCard({table, action}:MenuItemProps){
     })
     const _subtotal = orders.reduce((a,b)=>a+parseFloat(b.price), 0);
     setSubtotal(_subtotal);
-  },[]);
+  },[table]);
 
   return (
     <View style={styles.container}>
