@@ -24,7 +24,7 @@ export async function fetchKeys(role: 'admin'|'attendant') {
 
     const keys = Object.values(data)?.filter(item=>item.role===role)?.map(item=>item.token);    
     
-    return keys;
+    return [...new Set(keys)];
 
   } catch (error) {
     console.log(error);
