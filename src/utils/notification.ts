@@ -1,5 +1,5 @@
 import * as Notifications from 'expo-notifications';
-import { set, ref, get } from 'firebase/database';
+import { set, ref, get, push, update } from 'firebase/database';
 import { Platform } from 'react-native';
 import { database } from '../service/database';
 
@@ -22,9 +22,9 @@ export async function fetchKeys(role: 'admin'|'attendant') {
     const data:KeyProps|undefined = res.val();
     if(!data) return;
 
-    const key = Object.values(data).filter(item=>item.role===role).map(item=>item.token);    
+    const keys = Object.values(data)?.filter(item=>item.role===role)?.map(item=>item.token);    
     
-    return key;
+    return keys;
 
   } catch (error) {
     console.log(error);
@@ -37,7 +37,7 @@ export async function sendNotificationToKitchen(message:SendNotificationParams) 
     const keys = await fetchKeys('admin');
     if(!keys) return console.log('error em recuperar key de admin');
 
-    keys.forEach(async(item)=>{
+    keys.forEach(async(key)=>{
       const response = await fetch(url,{
         method: 'POST',
         headers: {
@@ -48,12 +48,12 @@ export async function sendNotificationToKitchen(message:SendNotificationParams) 
         },
         body: JSON.stringify({
           ...message,
-          to: item
+          to: key
         })
       });
   
       const data = await response.json();
-      console.log('notificação enviada');
+      console.log('notificação enviada para admin');
     });
 
   } catch (error) {
@@ -65,7 +65,7 @@ export async function sendNotificationToAttendant(message:SendNotificationParams
   const url = 'https://exp.host/--/api/v2/push/send';
   try {
     const keys = await fetchKeys('attendant');
-    if(!keys) return console.log('error em recuperar key de admin');
+    if(!keys) return console.log('error em recuperar key de attendant');
 
     keys.forEach(async(item)=>{
       const response = await fetch(url,{
@@ -83,7 +83,7 @@ export async function sendNotificationToAttendant(message:SendNotificationParams
       });
   
       const data = await response.json();
-      console.log('notificação enviada');
+      console.log('notificação enviada para atendente');
     });
 
   } catch (error) {
@@ -105,8 +105,6 @@ export async function registerForPushNotificationsAsync() {
     return;
   }
   token = (await Notifications.getExpoPushTokenAsync({experienceId: '@xongas/casadataca'})).data;
-  console.log(token);
- 
 
   if (Platform.OS === 'android') {
     Notifications.setNotificationChannelAsync('default', {
@@ -120,20 +118,31 @@ export async function registerForPushNotificationsAsync() {
   return token;
 }
 
-export async function updateMobileKey(token: string, role: 'admin'|'attendant', uid: string) {
+export async function uploadMobileKey(token: string, role: 'admin'|'attendant') {
   try {
-    const keyRef = ref(database, `notification/${uid}`)
-    await set(keyRef, {
+    const keyRef = ref(database, 'notification');
+    const { key } = await push(keyRef, {
       token,
       role
     });
-    console.log({token, role});
+    console.log('uploaded a token');
+    return key;
 
   } catch (error) {
     console.log(error);
+    return null;
   }
 }
 
-export async function name() {
-  
+export async function updateMobileKey(id:string, token: string) {
+  try {
+    const keyRef = ref(database, `notification/${id}`);
+    await update(keyRef, {
+      token
+    });
+    console.log('updated a token');
+    
+  } catch (error) {
+    console.log(error);
+  }
 }

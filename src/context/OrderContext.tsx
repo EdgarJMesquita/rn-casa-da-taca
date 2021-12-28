@@ -4,8 +4,9 @@ import { onValue, ref, off, push, update, set, remove, onChildAdded, get } from 
 import { database } from "../service/database";
 import * as Notifications from 'expo-notifications';
 import { User } from '../screens/Login';
-import { registerForPushNotificationsAsync, sendNotificationToAttendant, sendNotificationToKitchen, updateMobileKey } from '../utils/notification';
+import { registerForPushNotificationsAsync, sendNotificationToAttendant, sendNotificationToKitchen, updateMobileKey, uploadMobileKey } from '../utils/notification';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Subscription } from 'expo-modules-core';
 
 export type OrderProps = {
   id: string;
@@ -273,41 +274,55 @@ export function OrdersContextProvider({children}:OrdersContextProviderProps){
     }
   },[user]);
 
-  useEffect(()=>{
+ /*  useEffect(()=>{
     if(!user) return;
-    const subscription = Notifications.addPushTokenListener(({data})=>{
-      const role = user?.uid==='WlbQiG4RCSeKrNkqSpMvhZWlByE2' || user?.uid==='4s2VROZeAdd5HlJFj18imS4i7hh2'? 'admin':'attendant';
-      if(!user.uid) return;
-      updateMobileKey(data, role, user.uid);
+    const subscription = Notifications.addPushTokenListener(async({data})=>{
+      //const role = user?.uid==='WlbQiG4RCSeKrNkqSpMvhZWlByE2' || user?.uid==='4s2VROZeAdd5HlJFj18imS4i7hh2'? 'admin':'attendant';
+      const tokenId = await AsyncStorage.getItem('@TOKEN_ID');
+      if(!tokenId) return;
+
+      updateMobileKey(tokenId, data);
     });
     return()=>{
       subscription.remove();
     }
-  },[user]);
+  },[user]); */
 
   useEffect(()=>{
-    if(!user) return;
+    let subscription:Subscription|null = null;
+
     (async()=>{
-      try {
-        const store = await AsyncStorage.getItem('@token');
-        if(store) return console.log('Token em async storage: '+store);
+      if(!user) return;
+      const store = await AsyncStorage.getItem('@TOKEN_ID');
+      if(store) {
+        subscription = Notifications.addPushTokenListener(async({data})=>{
+          const tokenId = await AsyncStorage.getItem('@TOKEN_ID');
+          if(!tokenId) return;
+          await updateMobileKey(tokenId, data);
+        });
 
-        const token = await registerForPushNotificationsAsync();
-        if(!token) return console.log('Missing token');
-
-        const role = user?.uid==='WlbQiG4RCSeKrNkqSpMvhZWlByE2' || user?.uid==='4s2VROZeAdd5HlJFj18imS4i7hh2'? 'admin':'attendant';
-        
-        if(user.uid){
-          await updateMobileKey(token, role, user.uid);
+      } else {
+        try {
+          const token = await registerForPushNotificationsAsync();
+          if(!token) return console.log('Missing token.');
+          const role = user?.uid==='WlbQiG4RCSeKrNkqSpMvhZWlByE2' || user?.uid==='4s2VROZeAdd5HlJFj18imS4i7hh2'? 'admin':'attendant';
+          const key = await uploadMobileKey(token, role);
+          if(!key) return;
+          await AsyncStorage.setItem('@TOKEN_ID', key);
+  
+        } catch (error) {
+          console.log(error);
         }
-        await AsyncStorage.setItem('@token',token);
-
-      } catch (error) {
-        console.log(error);
       }
     })();
+    return()=>{
+      subscription?.remove();
+    }
   },[user]);
-  //AsyncStorage.removeItem('@token');
+  
+  //AsyncStorage.removeItem('@TOKEN_ID');
+  //AsyncStorage.getItem('@TOKEN_ID').then(res=>console.log(res));
+  
   return(
     <OrdersContext.Provider value={{
       user,
