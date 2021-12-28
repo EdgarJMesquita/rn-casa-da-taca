@@ -125,7 +125,7 @@ export async function uploadMobileKey(token: string, role: 'admin'|'attendant') 
       token,
       role
     });
-    console.log('uploaded a token');
+    console.log('uploaded a token'+key);
     return key;
 
   } catch (error) {

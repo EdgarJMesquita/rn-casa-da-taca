@@ -302,7 +302,7 @@ export function OrdersContextProvider({children}:OrdersContextProviderProps){
         });
 
       } else {
-        try {
+        /* try {
           const token = await registerForPushNotificationsAsync();
           if(!token) return console.log('Missing token.');
           const role = user?.uid==='WlbQiG4RCSeKrNkqSpMvhZWlByE2' || user?.uid==='4s2VROZeAdd5HlJFj18imS4i7hh2'? 'admin':'attendant';
@@ -312,7 +312,7 @@ export function OrdersContextProvider({children}:OrdersContextProviderProps){
   
         } catch (error) {
           console.log(error);
-        }
+        } */
       }
     })();
     return()=>{

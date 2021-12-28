@@ -6,6 +6,7 @@ import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "firebas
 import { useOrders } from '../../hooks/useOrders';
 import { styles } from './styles';
 import { theme } from '../../global/theme';
+import { registerForPushNotificationsAsync, uploadMobileKey } from '../../utils/notification';
 
 const auth = getAuth();
 
@@ -38,19 +39,27 @@ export function Login(){
       }
       await AsyncStorage.setItem('@uid', JSON.stringify(_user));
 
-      setUser(_user);
+      //setUser(_user);
+
+      /* const token = await registerForPushNotificationsAsync();
+      if(!token) return console.log('Missing token.');
+      const role = user?.uid==='WlbQiG4RCSeKrNkqSpMvhZWlByE2' || user?.uid==='4s2VROZeAdd5HlJFj18imS4i7hh2'? 'admin':'attendant';
+      const key = await uploadMobileKey(token, role);
+      if(!key) return;
+      await AsyncStorage.setItem('@TOKEN_ID', key);
+      console.log('login'); */
 
     } catch (error) {
-      console.log(error);
-      alert(error);
-      
-    } finally {
-      setLoading(false);
+      alert('Email ou Senha inválidos.');
+      setLoading(false); 
+      //console.log(String(error).includes('wrong-password'));
+      //if(String(error).includes('wrong-password')) 
+      //console.log(String(error).includes('user-not-found'));
     }
   }
 
   useEffect(()=>{
-    onAuthStateChanged(auth, (user) => {
+    onAuthStateChanged(auth, async(user) => {
       if (user) {
         const _user = {
           uid: user.uid,
@@ -58,6 +67,24 @@ export function Login(){
           email: user.email,
           avatar: user.photoURL
         }
+        
+        try {
+          const tokenId = await AsyncStorage.getItem('@TOKEN_ID');
+          if(!tokenId){
+            const token = await registerForPushNotificationsAsync();
+            if(token){
+              const role = user?.uid==='WlbQiG4RCSeKrNkqSpMvhZWlByE2' || user?.uid==='4s2VROZeAdd5HlJFj18imS4i7hh2'? 'admin':'attendant';
+              const key = await uploadMobileKey(token, role);
+              if(key){
+                await AsyncStorage.setItem('@TOKEN_ID', key);
+              }
+            }
+          }
+        } catch (error) {
+          console.log(error);  
+        }
+        
+        setLoading(false);
         setUser(_user);
       }
     });
