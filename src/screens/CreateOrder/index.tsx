@@ -24,28 +24,51 @@ export function CreateOrder({ route, navigation}:CreateOrderProps){
 
   async function handleAddOrder() {
     if(!firstFlavor || !selectedMenuItem?.name) return;
-    
-    const order = {
-      name: selectedMenuItem?.name,
-      firstFlavor,
-      observation,
-      price: String(selectedMenuItem?.prices[size]),
-      secondFlavor: 
-        (selectedMenuItem?.sizes[size]===330 || selectedMenuItem?.sizes[size] === 600 || selectedMenuItem?.type==="ship")? 
-        secondFlavor:'',
-      size: selectedMenuItem?.sizes[size],
-      type: selectedMenuItem.type,
-      status: 'new'
-    }
 
-    try {
-      const orderRef = await addOrder(tableId, memberId, order);
-      if(!orderRef) return;
-      
-      navigation.goBack();
+    if(selectedMenuItem.type==='cup'){
+      // Cups
+      const order = {
+        name: selectedMenuItem?.name,
+        firstFlavor,
+        observation,
+        price: String(selectedMenuItem?.prices[size]),
+        secondFlavor: selectedMenuItem?.sizes[size] !== 250? secondFlavor:'',
+        size: selectedMenuItem?.sizes[size],
+        type: selectedMenuItem.type,
+        status: 'new'
+      }
+  
+      try {
+        const orderRef = await addOrder(tableId, memberId, order);
+        if(!orderRef) return;
+        
+        navigation.goBack();
+  
+      } catch (error) {
+        console.log(error);
+      }
 
-    } catch (error) {
-      console.log(error);
+    } else {
+      // Ships
+      const order = {
+        name: selectedMenuItem?.name,
+        firstFlavor,
+        observation,
+        price: String(selectedMenuItem?.prices[size]),
+        secondFlavor: secondFlavor,
+        type: selectedMenuItem.type,
+        status: 'new'
+      }
+  
+      try {
+        const orderRef = await addOrder(tableId, memberId, order);
+        if(!orderRef) return;
+        
+        navigation.goBack();
+  
+      } catch (error) {
+        console.log(error);
+      }
     }
   }
 

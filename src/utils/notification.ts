@@ -53,7 +53,7 @@ export async function sendNotificationToKitchen(message:SendNotificationParams) 
       });
   
       const data = await response.json();
-      console.log('notificação enviada para admin');
+      console.log('notificação enviada para admin: '+key);
     });
 
   } catch (error) {
