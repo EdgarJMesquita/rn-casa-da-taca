@@ -32,7 +32,8 @@ export const styles = StyleSheet.create({
   date: {
     fontFamily: theme.fonts.Roboto_700,
     color: theme.colors.text,
-    fontSize: 20
+    fontSize: 20,
+    marginLeft: 35
   },
 
   label: {

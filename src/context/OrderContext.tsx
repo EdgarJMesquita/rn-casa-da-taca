@@ -215,7 +215,7 @@ export function OrdersContextProvider({children}:OrdersContextProviderProps){
       );
       const store = await get(historyRef);
       const history:TableProps[] = store.val();
-
+      
       if(history){
         return history;
       }

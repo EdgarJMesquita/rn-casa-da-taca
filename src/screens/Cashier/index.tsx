@@ -7,9 +7,9 @@ import { OrderProps, TableProps } from '../../context/OrderContext';
 import { theme } from '../../global/theme';
 import { useOrders } from '../../hooks/useOrders';
 import DatePicker from '@react-native-community/datetimepicker';
+import { FontAwesome } from '@expo/vector-icons';
 import { format } from 'date-fns';
 import { styles } from './styles';
-
 export function Cashier(){
   const [ orders, setOrders ] = useState<OrderProps[]>([]);
   const [ members, setMembers ] = useState<string[]>([]);
@@ -48,11 +48,11 @@ export function Cashier(){
   
     data?.forEach(table=>{
       table.members?.forEach(member=>{
-        if(member.orders.length!==0){
+        if(member.orders?.length!==0){
           allMembers.push(member.name);
         }
-        member.orders.forEach(order=>{
-          if(order.status==='paid'){
+        member.orders?.forEach(order=>{
+          if(order?.status==='paid'){
             allOrders.push(order);
           }
         })
@@ -81,11 +81,21 @@ export function Cashier(){
       const month = date.getMonth()+1;
       const day = date.getDate();
 
-      const history = await fetchReport(year, month, day);
+      try {
+        setLoading(true);
+        const history = await fetchReport(year, month, day);
+        if(history){
+          const { allOrders, allMembers } = parseTablesToArray(history);
+          setOrders(allOrders);
+          setMembers(allMembers);
+        }
+        
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoading(false);
+      }
 
-      const { allOrders, allMembers } = parseTablesToArray(history);
-      setOrders(allOrders);
-      setMembers(allMembers);
     }
     handleFetchReport();
   },[date])
@@ -116,17 +126,25 @@ export function Cashier(){
             </Text>
             <TouchableOpacity
               onPress={()=>setShow(true)}
+              style={{flexDirection: 'row'}}
             >
               <Text style={styles.date}>
                 {format(date, 'dd/MM/yyyy')}
               </Text>
+              {
+                isLoading?(
+                  <ActivityIndicator size={24} color={theme.colors.primary} style={{marginLeft: 10}}/>                  
+                ):(
+                  <FontAwesome name="search" size={24} color={theme.colors.primary} style={{marginLeft: 10}}/>
+                )
+              }
             </TouchableOpacity>
           </View>
 
           <View style={{marginTop: 10}}>
             <View style={{flexDirection: 'row', justifyContent: 'center'}}>
               <Text style={styles.title}>
-                {members.length}
+                {members?.length}
               </Text>
               <Text style={styles.label}>
                 {' '}Clientes
@@ -190,7 +208,7 @@ export function Cashier(){
                     {name}:
                   </Text>
                   <Text style={[styles.subtitle, {marginLeft: 10}]}>
-                    {orders.filter(item=>item.type==='cup' && item.name===name).length}
+                    {orders.filter(item=>item.type==='ship' && item.name===name).length}
                   </Text>
                 </View>
                 <View style={{flexDirection: 'row'}}>
@@ -198,7 +216,7 @@ export function Cashier(){
                     R$
                   </Text>
                   <Text style={[styles.subtitle, {marginLeft: 10}]}>
-                    {(orders.filter(item=>item.type==='cup' && item.name===name)?.reduce((a,b)=>a+parseFloat(b.price),0)).toFixed(2)}
+                    {(orders.filter(item=>item.type==='ship' && item.name===name)?.reduce((a,b)=>a+parseFloat(b.price),0)).toFixed(2)}
                   </Text>
                 </View>
               </View>
