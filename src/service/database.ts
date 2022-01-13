@@ -1,14 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getDatabase } from 'firebase/database';
-
-const firebaseConfig = {
-  apiKey: "AIzaSyAt4Z-KPOkL3KdO7h1rAOS0DufLHI8sUrU",
-  authDomain: "casa-da-taca.firebaseapp.com",
-  projectId: "casa-da-taca",
-  storageBucket: "casa-da-taca.appspot.com",
-  messagingSenderId: "699739679072",
-  appId: "1:699739679072:web:45698d480c153e31795605"
-};
+import firebaseConfig from '../../firebaseConfig.json';
 
 const app = initializeApp(firebaseConfig);
 
