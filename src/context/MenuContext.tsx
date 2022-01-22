@@ -9,7 +9,7 @@ export type MenuProps = {
   sizes: number[];
   prices: number[];
 }
-
+ 
 type MenuContextProviderProps = {
   children: ReactNode;
 }
