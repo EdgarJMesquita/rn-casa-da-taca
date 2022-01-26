@@ -4,7 +4,7 @@ import { theme } from './src/global/theme';
 import { Routes } from './src/routes';
 import { Roboto_400Regular, Roboto_700Bold } from '@expo-google-fonts/roboto';
 import { Ubuntu_400Regular, Ubuntu_500Medium } from '@expo-google-fonts/ubuntu';
-import { useFonts } from 'expo-font';
+import { useFonts } from 'expo-font'; 
 import AppLoading from 'expo-app-loading';
 import { Background } from './src/components/Background';
 import { MenuContextProvider } from './src/context/MenuContext';
